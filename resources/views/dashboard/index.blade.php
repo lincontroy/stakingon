@@ -8,7 +8,7 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4">
         <div>
             <div class="d-flex align-items-center gap-3 mb-3">
-                <div class="user-avatar">
+                
                     @php
                         $userName = Auth::user()->name;
                         if (is_array($userName)) {
@@ -16,8 +16,8 @@
                         }
                         $firstLetter = strtoupper(substr((string)$userName, 0, 1));
                     @endphp
-                    {{ $firstLetter }}
-                </div>
+                  
+              
                 <div>
                     <h1 class="display-6 fw-bold mb-2 text-gradient">
                         Welcome back, {{ $userName }}! 👋
