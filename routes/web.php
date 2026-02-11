@@ -17,6 +17,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Staking Routes
     Route::prefix('staking')->name('staking.')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('active');
         Route::get('/', [StakingController::class, 'index'])->name('index');
         Route::get('/pool/{id}', [StakingController::class, 'show'])->name('show');
         Route::post('/pool/{id}/stake', [StakingController::class, 'stake'])->name('stake');
