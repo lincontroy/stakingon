@@ -585,7 +585,7 @@
             <p>Trade Bitcoin, USDT & Ethereum with verified users. Transparent fees and a smooth experience on stakingon.</p>
             <form class="signup-form">
                 <input type="email" class="signup-input" placeholder="Email/Phone number">
-                <a href="/register" class="btn-signup">Sign Up</button>
+                <a href="/register" class="btn-signup">Sign Up</a>
             </form>
         </div>
 
