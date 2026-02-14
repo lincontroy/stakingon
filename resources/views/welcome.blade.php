@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Primary Meta Tags -->
-    <title>Secure P2P Crypto Trading Platform | StakingOn</title>
+    <title>Secure  Trading Platform | StakingOn</title>
     <meta name="title" content="Secure P2P Crypto Trading Platform | StakingOn">
     <meta name="description" content="Trade Bitcoin, USDT & Ethereum with verified users. Transparent fees and a smooth experience on StakingOn.">
     <meta name="keywords" content="P2P crypto trading, Bitcoin P2P, USDT exchange, secure crypto marketplace, crypto trading platform">
     <meta name="author" content="StakingOn">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -548,7 +549,34 @@
                 font-size: 2rem;
             }
         }
+
+        .hero-section h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.2;
+    letter-spacing: -1px;
+}
+
+.hero-number {
+    font-weight: 800;
+    font-size: 56px;
+    display: inline-block;
+}
+
+/* Mobile Styling */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        text-align: center;
+        font-size: 32px;
+    }
+
+    .hero-number {
+        font-size: 38px;
+    }
+}
     </style>
+    
 </head>
 <body>
     <!-- Navigation -->
@@ -556,7 +584,7 @@
         <div class="nav-container">
             <a href="#" class="logo">
                 <div class="logo-icon">S</div>
-                <span>stakingon</span>
+                <span style="color:white">Stakingon</span>
             </a>
             <ul class="nav-links">
                 <li><a href="#how-it-works">How It Works</a></li>
@@ -578,7 +606,7 @@
     <section class="hero">
         <div class="hero-content">
             <h1>
-                <span class="hero-number">289,966,416</span><br>
+                <span class="hero-number" id="userCount">289,966,416</span><br>
                 USERS<br>
                 TRUST US
             </h1>
@@ -587,7 +615,20 @@
                 <a href="/register" class="btn-primary">Sign Up</a>
             </form>
 
-            <style>.signup-form {
+            <script>
+                let count = 289966416; // Starting number
+                const counterElement = document.getElementById("userCount");
+            
+                function updateCounter() {
+                    count += 1; // Increase by 1 every second
+                    counterElement.textContent = count.toLocaleString();
+                }
+            
+                setInterval(updateCounter, 1000);
+            </script>
+
+           
+<style>.signup-form {
     display: flex;
     align-items: center;
     gap: 10px;
