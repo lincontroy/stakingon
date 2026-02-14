@@ -582,11 +582,29 @@
                 USERS<br>
                 TRUST US
             </h1>
-            <p>Trade Bitcoin, USDT & Ethereum with verified users. Transparent fees and a smooth experience on stakingon.</p>
-            <form class="signup-form">
+           <form class="signup-form">
                 <input type="email" class="signup-input" placeholder="Email/Phone number">
-                <a href="/register" class="btn-signup">Sign Up</a>
+                <a href="/register" class="btn-primary">Sign Up</a>
             </form>
+
+            <style>.signup-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Mobile View */
+@media (max-width: 768px) {
+    .signup-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .signup-input,
+    .btn-signup {
+        width: 100%;
+    }
+}</style>
         </div>
 
         <div class="crypto-ticker">
