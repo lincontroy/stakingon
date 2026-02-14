@@ -8,7 +8,7 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\TransactionController;
 
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    return view('welcome');
 });
 
 Route::middleware(['auth'])->group(function () {
