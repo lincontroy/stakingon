@@ -565,7 +565,7 @@
                 <li><a href="#learn">Learn</a></li>
                 <li><a href="#support">Support</a></li>
             </ul>
-            <a href="#login" class="btn-primary">
+            <a href="/login" class="btn-primary">
                 Login
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -585,7 +585,7 @@
             <p>Trade Bitcoin, USDT & Ethereum with verified users. Transparent fees and a smooth experience on stakingon.</p>
             <form class="signup-form">
                 <input type="email" class="signup-input" placeholder="Email/Phone number">
-                <button type="submit" class="btn-signup">Sign Up</button>
+                <a href="/register" class="btn-signup">Sign Up</button>
             </form>
         </div>
 
@@ -733,7 +733,7 @@
         <div class="cta-container">
             <h2>Ready to Start Trading?</h2>
             <p>Join thousands of traders on stakingon today</p>
-            <a href="#login" class="btn-primary" style="font-size: 1.1rem; padding: 1rem 3rem;">
+            <a href="/login" class="btn-primary" style="font-size: 1.1rem; padding: 1rem 3rem;">
                 Get Started Now
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
