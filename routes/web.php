@@ -14,6 +14,7 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/support', [DashboardController::class, 'index'])->name('support');
     
     // Staking Routes
     Route::prefix('staking')->name('staking.')->group(function () {

@@ -54,16 +54,19 @@ class StakingPool extends Model
 
     public function getDailyRewardRateAttribute()
     {
-        return ($this->apy / 365) / 100;
+        return ($this->apy) / 100;
     }
 
     public function calculateReward($amount, $durationMinutes = null)
     {
+
         $duration = $durationMinutes ?? $this->duration_minutes;
         $dailyRate = $this->daily_reward_rate;
+
+        // dd($amount, $dailyRate, $duration);
         $days = $duration / 1440; // Convert minutes to days
         
-        return $amount * $dailyRate * $days;
+        return $amount * $dailyRate;
     }
 
     public function getCoinColorAttribute()

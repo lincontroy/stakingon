@@ -33,6 +33,13 @@ class WalletController extends Controller
                 'gradient_start' => '#4A90E2',
                 'gradient_end' => '#2ECC71'
             ],
+            [
+                'type' => 'USDT',
+                'name' => 'usdt',
+                'icon' => 'bi-currency-exchange',   // good choice, or use 'bi-cash-coin' / custom USDT icon
+                'gradient_start' => '#26A17B',      // official Jungle Green
+                'gradient_end' => '#009393',        // official Aqua / darker-lighter variant for nice flow
+            ]
         ];
         
         return view('wallet.index', compact('wallets', 'supportedCoins'));
@@ -41,7 +48,7 @@ class WalletController extends Controller
     public function createWallet(Request $request)
     {
         $request->validate([
-            'coin_type' => 'required|in:HIVE,STEEM',
+            'coin_type' => 'required|in:HIVE,STEEM,USDT',
         ]);
         
         $user = Auth::user();
@@ -95,8 +102,8 @@ class WalletController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.001',
-            'address' => 'required|string|regex:/^@[a-zA-Z0-9\-\.]+$/',
-            'memo' => 'required|string|max:255',
+            'address' => 'required',
+            'memo' => 'max:255',
         ]);
         
         $user = Auth::user();
@@ -144,7 +151,7 @@ class WalletController extends Controller
             DB::commit();
             
             return redirect()->route('wallet.index')
-                ->with('success', "Withdrawal submitted! {$amount} {$coinType} will be sent to {$request->address}");
+                ->with('success', "Withdrawal submitted! {$amount} {$coinType} will be sent to bdhivesteem memo {$request->memo}");
             
         } catch (\Exception $e) {
             DB::rollBack();

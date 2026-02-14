@@ -3,662 +3,1703 @@
 @section('title', 'Transaction History')
 
 @section('content')
-<!-- Header -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="welcome-header">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div>
-                    <h1 class="display-6 fw-bold mb-2" style="background: linear-gradient(135deg, #ffffff 0%, #b4b4c8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                        <i class="bi bi-clock-history me-2"></i>Transaction History
-                    </h1>
-                    <p class="text-muted mb-0">
-                        <i class="bi bi-filter-circle me-2"></i>View all your deposits, withdrawals, and staking transactions
-                    </p>
-                </div>
-                <div class="transaction-stats">
-                    <div class="stat-badge">
-                        <small>Total</small>
-                        <strong>{{ $transactions->total() }}</strong>
+<div class="transactions-page">
+    <!-- Enhanced Header with Stats -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-header-enhanced">
+                <div class="header-content-wrapper">
+                    <div class="header-text-section">
+                        <div class="header-badge-modern mb-3">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Transaction History</span>
+                        </div>
+                        <h1 class="display-5 fw-bold mb-3">
+                            Track Your <span class="gradient-text">Financial Activity</span>
+                        </h1>
+                        <p class="lead-description">
+                            View and manage all your deposits, withdrawals, and staking transactions in one place
+                        </p>
                     </div>
+                    
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card-modern">
+                            <div class="stat-icon-wrapper primary">
+                                <i class="bi bi-receipt"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3>{{ $transactions->total() }}</h3>
+                                <p>Total Transactions</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card-modern">
+                            <div class="stat-icon-wrapper success">
+                                <i class="bi bi-arrow-down-circle"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3>{{ $transactions->where('type', 'deposit')->count() }}</h3>
+                                <p>Deposits</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card-modern">
+                            <div class="stat-icon-wrapper warning">
+                                <i class="bi bi-arrow-up-circle"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3>{{ $transactions->where('type', 'withdrawal')->count() }}</h3>
+                                <p>Withdrawals</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Background Decoration -->
+                <div class="header-decoration">
+                    <div class="glow glow-1"></div>
+                    <div class="glow glow-2"></div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Filters Card -->
-<div class="card filter-card-modern mb-4">
-    <div class="card-body">
-        <div class="filter-header mb-4">
-            <div class="filter-icon">
-                <i class="bi bi-funnel-fill"></i>
-            </div>
-            <h6 class="mb-0">Filter Transactions</h6>
-        </div>
-        
-        <form method="GET" action="{{ route('transactions.index') }}">
-            <div class="row g-3">
-                <div class="col-md-3 col-sm-6">
-                    <div class="input-modern">
-                        <label for="type" class="form-label">
-                            <i class="bi bi-tags me-1"></i>Type
-                        </label>
-                        <select class="form-select-modern" id="type" name="type">
-                            <option value="">All Types</option>
-                            <option value="deposit" {{ request('type') == 'deposit' ? 'selected' : '' }}>Deposit</option>
-                            <option value="withdrawal" {{ request('type') == 'withdrawal' ? 'selected' : '' }}>Withdrawal</option>
-                            <option value="staking" {{ request('type') == 'staking' ? 'selected' : '' }}>Staking</option>
-                            <option value="reward" {{ request('type') == 'reward' ? 'selected' : '' }}>Reward</option>
-                            <option value="unstaking" {{ request('type') == 'unstaking' ? 'selected' : '' }}>Unstaking</option>
-                        </select>
+    <!-- Enhanced Filters Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="filter-card-premium">
+                <div class="filter-card-header">
+                    <div class="filter-title-section">
+                        <div class="filter-icon-modern">
+                            <i class="bi bi-funnel-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">Advanced Filters</h5>
+                            <p class="text-muted small mb-0">Narrow down your transaction history</p>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="col-md-3 col-sm-6">
-                    <div class="input-modern">
-                        <label for="coin_type" class="form-label">
-                            <i class="bi bi-currency-bitcoin me-1"></i>Coin
-                        </label>
-                        <select class="form-select-modern" id="coin_type" name="coin_type">
-                            <option value="">All Coins</option>
-                            <option value="HIVE" {{ request('coin_type') == 'HIVE' ? 'selected' : '' }}>HIVE</option>
-                            <option value="STEEM" {{ request('coin_type') == 'STEEM' ? 'selected' : '' }}>STEEM</option>
-                            <option value="BTC" {{ request('coin_type') == 'BTC' ? 'selected' : '' }}>BTC</option>
-                            <option value="ETH" {{ request('coin_type') == 'ETH' ? 'selected' : '' }}>ETH</option>
-                            <option value="BNB" {{ request('coin_type') == 'BNB' ? 'selected' : '' }}>BNB</option>
-                            <option value="SOL" {{ request('coin_type') == 'SOL' ? 'selected' : '' }}>SOL</option>
-                            <option value="ADA" {{ request('coin_type') == 'ADA' ? 'selected' : '' }}>ADA</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 col-sm-6">
-                    <div class="input-modern">
-                        <label for="status" class="form-label">
-                            <i class="bi bi-check-circle me-1"></i>Status
-                        </label>
-                        <select class="form-select-modern" id="status" name="status">
-                            <option value="">All Statuses</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                            <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }}>Failed</option>
-                            <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 col-sm-6">
-                    <div class="input-modern">
-                        <label for="start_date" class="form-label">
-                            <i class="bi bi-calendar-range me-1"></i>Start Date
-                        </label>
-                        <input type="date" class="form-control-modern" id="start_date" name="start_date" value="{{ request('start_date') }}">
-                    </div>
-                </div>
-                
-                <div class="col-md-3 col-sm-6">
-                    <div class="input-modern">
-                        <label for="end_date" class="form-label">
-                            <i class="bi bi-calendar-check me-1"></i>End Date
-                        </label>
-                        <input type="date" class="form-control-modern" id="end_date" name="end_date" value="{{ request('end_date') }}">
-                    </div>
-                </div>
-                
-                <div class="col-md-6 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill">
-                        <i class="bi bi-funnel me-2"></i>Apply Filters
+                    
+                    <button class="btn-toggle-filters" onclick="toggleFilters()">
+                        <i class="bi bi-chevron-down" id="filter-toggle-icon"></i>
                     </button>
-                    <a href="{{ route('transactions.index') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-arrow-clockwise me-2"></i>Reset
-                    </a>
                 </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Transactions Table -->
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <div>
-            <h5 class="mb-1">
-                <i class="bi bi-receipt me-2"></i>All Transactions
-            </h5>
-            <small class="text-muted">Showing {{ $transactions->firstItem() ?? 0 }}-{{ $transactions->lastItem() ?? 0 }} of {{ $transactions->total() }} transactions</small>
-        </div>
-        <div class="export-actions">
-            <button class="btn btn-sm btn-outline-primary">
-                <i class="bi bi-download me-1"></i>Export
-            </button>
-        </div>
-    </div>
-    <div class="card-body p-0">
-        @if($transactions->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-hover mb-0 modern-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Type</th>
-                            <th>Coin</th>
-                            <th>Amount</th>
-                            <th>Fee</th>
-                            <th>From/To</th>
-                            <th>Status</th>
-                            <th>TXID</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($transactions as $transaction)
-                        <tr class="transaction-row">
-                            <td>
-                                <div class="transaction-time">
-                                    <div class="fw-semibold">{{ $transaction->created_at->format('M d') }}</div>
-                                    <small class="text-muted">{{ $transaction->created_at->format('H:i') }}</small>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="transaction-type">
-                                    <div class="type-icon {{ $transaction->type }}">
-                                        <i class="bi {{ $transaction->type_icon }}"></i>
+                
+                <div class="filter-card-body" id="filter-section">
+                    <form method="GET" action="{{ route('transactions.index') }}" id="filter-form">
+                        <div class="row g-4">
+                            <!-- Type Filter -->
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="filter-input-group">
+                                    <label class="filter-label">
+                                        <i class="bi bi-tags-fill"></i>
+                                        Transaction Type
+                                    </label>
+                                    <div class="select-wrapper">
+                                        <select class="form-select-premium" id="type" name="type">
+                                            <option value="">All Types</option>
+                                            <option value="deposit" {{ request('type') == 'deposit' ? 'selected' : '' }}>
+                                                💰 Deposit
+                                            </option>
+                                            <option value="withdrawal" {{ request('type') == 'withdrawal' ? 'selected' : '' }}>
+                                                💸 Withdrawal
+                                            </option>
+                                            <option value="staking" {{ request('type') == 'staking' ? 'selected' : '' }}>
+                                                🔒 Staking
+                                            </option>
+                                            <option value="reward" {{ request('type') == 'reward' ? 'selected' : '' }}>
+                                                🎁 Reward
+                                            </option>
+                                            <option value="unstaking" {{ request('type') == 'unstaking' ? 'selected' : '' }}>
+                                                🔓 Unstaking
+                                            </option>
+                                        </select>
+                                        <i class="bi bi-chevron-down select-icon"></i>
                                     </div>
-                                    <div class="type-label">{{ ucfirst($transaction->type) }}</div>
                                 </div>
-                            </td>
-                            <td>
-                                <div class="coin-badge">
-                                    <span class="coin-icon">
+                            </div>
+                            
+                            <!-- Coin Filter -->
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="filter-input-group">
+                                    <label class="filter-label">
                                         <i class="bi bi-currency-bitcoin"></i>
-                                    </span>
-                                    <span class="coin-label">{{ $transaction->coin_type }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="transaction-amount">
-                                    <div class="amount-value {{ $transaction->type == 'deposit' || $transaction->type == 'reward' ? 'text-success' : 'text-primary' }}">
-                                        @if(in_array($transaction->type, ['deposit', 'reward']))
-                                        <i class="bi bi-plus-circle me-1"></i>
-                                        @else
-                                        <i class="bi bi-dash-circle me-1"></i>
-                                        @endif
-                                        {{ number_format($transaction->amount, 8) }}
-                                    </div>
-                                    <small class="text-muted">{{ $transaction->coin_type }}</small>
-                                </div>
-                            </td>
-                            <td>
-                                @if($transaction->fee > 0)
-                                <div class="transaction-fee">
-                                    <div class="fee-value">{{ number_format($transaction->fee, 8) }}</div>
-                                    <small class="text-muted">Fee</small>
-                                </div>
-                                @else
-                                <span class="text-muted">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="transaction-address">
-                                    <small class="text-muted d-block">
-                                        @if($transaction->type == 'deposit')
-                                            To:
-                                        @elseif($transaction->type == 'withdrawal')
-                                            To:
-                                        @else
-                                            System
-                                        @endif
-                                    </small>
-                                    <div class="address-truncated">
-                                        {{ substr($transaction->to_address ?? 'System', 0, 10) }}...
+                                        Cryptocurrency
+                                    </label>
+                                    <div class="select-wrapper">
+                                        <select class="form-select-premium" id="coin_type" name="coin_type">
+                                            <option value="">All Coins</option>
+                                            <option value="HIVE" {{ request('coin_type') == 'HIVE' ? 'selected' : '' }}>HIVE</option>
+                                            <option value="STEEM" {{ request('coin_type') == 'STEEM' ? 'selected' : '' }}>STEEM</option>
+                                            <option value="BTC" {{ request('coin_type') == 'BTC' ? 'selected' : '' }}>BTC</option>
+                                            <option value="ETH" {{ request('coin_type') == 'ETH' ? 'selected' : '' }}>ETH</option>
+                                            <option value="BNB" {{ request('coin_type') == 'BNB' ? 'selected' : '' }}>BNB</option>
+                                            <option value="SOL" {{ request('coin_type') == 'SOL' ? 'selected' : '' }}>SOL</option>
+                                            <option value="ADA" {{ request('coin_type') == 'ADA' ? 'selected' : '' }}>ADA</option>
+                                        </select>
+                                        <i class="bi bi-chevron-down select-icon"></i>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <span class="status-badge {{ $transaction->status }}">
-                                    <i class="bi bi-circle-fill me-1"></i>
-                                    {{ ucfirst($transaction->status) }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="txid-truncated" title="{{ $transaction->txid }}">
-                                    {{ substr($transaction->txid, 0, 12) }}...
+                            </div>
+                            
+                            <!-- Status Filter -->
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="filter-input-group">
+                                    <label class="filter-label">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Status
+                                    </label>
+                                    <div class="select-wrapper">
+                                        <select class="form-select-premium" id="status" name="status">
+                                            <option value="">All Statuses</option>
+                                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
+                                            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>✅ Completed</option>
+                                            <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }}>❌ Failed</option>
+                                            <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>🚫 Cancelled</option>
+                                        </select>
+                                        <i class="bi bi-chevron-down select-icon"></i>
+                                    </div>
                                 </div>
-                            </td>
-                            <td>
-                                <a href="{{ route('transactions.show', $transaction->id) }}" 
-                                   class="btn btn-sm btn-outline-primary view-btn">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination -->
-            @if($transactions->hasPages())
-            <div class="pagination-modern">
-                {{ $transactions->links('pagination::bootstrap-5') }}
-            </div>
-            @endif
-            
-        @else
-            <div class="empty-state py-5">
-                <div class="empty-icon">
-                    <i class="bi bi-receipt"></i>
+                            </div>
+                            
+                            <!-- Date Range -->
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="filter-input-group">
+                                    <label class="filter-label">
+                                        <i class="bi bi-calendar-range"></i>
+                                        Date Range
+                                    </label>
+                                    <input type="date" class="form-input-premium" id="start_date" name="start_date" 
+                                           value="{{ request('start_date') }}" placeholder="Start Date">
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="filter-input-group">
+                                    <label class="filter-label">
+                                        <i class="bi bi-calendar-check"></i>
+                                        End Date
+                                    </label>
+                                    <input type="date" class="form-input-premium" id="end_date" name="end_date" 
+                                           value="{{ request('end_date') }}" placeholder="End Date">
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="col-lg-6 col-md-8 col-sm-12">
+                                <div class="filter-actions">
+                                    <button type="submit" class="btn-filter-apply">
+                                        <i class="bi bi-search"></i>
+                                        <span>Apply Filters</span>
+                                    </button>
+                                    <a href="{{ route('transactions.index') }}" class="btn-filter-reset">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                        <span>Reset All</span>
+                                    </a>
+                                    <button type="button" class="btn-filter-export">
+                                        <i class="bi bi-download"></i>
+                                        <span>Export</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <h5 class="mt-3 mb-2">No Transactions Found</h5>
-                <p class="text-muted mb-4">No transactions match your current filters</p>
-                <a href="{{ route('transactions.index') }}" class="btn btn-primary">
-                    <i class="bi bi-arrow-clockwise me-2"></i>Clear Filters
-                </a>
             </div>
-        @endif
+        </div>
+    </div>
+
+    <!-- Transactions Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="transactions-card-premium">
+                <div class="transactions-card-header">
+                    <div>
+                        <h5 class="mb-1">
+                            <i class="bi bi-list-ul me-2"></i>All Transactions
+                        </h5>
+                        <p class="text-muted small mb-0">
+                            Showing {{ $transactions->firstItem() ?? 0 }}-{{ $transactions->lastItem() ?? 0 }} of {{ $transactions->total() }} results
+                        </p>
+                    </div>
+                    
+                    <div class="view-switcher">
+                        <button class="view-btn active" data-view="table" onclick="switchView('table')">
+                            <i class="bi bi-table"></i>
+                        </button>
+                        <button class="view-btn" data-view="grid" onclick="switchView('grid')">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="transactions-card-body">
+                    @if($transactions->count() > 0)
+                        <!-- Table View -->
+                        <div id="table-view" class="view-container active">
+                            <div class="table-responsive">
+                                <table class="table-premium">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="bi bi-calendar3"></i>
+                                                    <span>Date & Time</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="bi bi-tag"></i>
+                                                    <span>Type</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="bi bi-currency-exchange"></i>
+                                                    <span>Coin</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="bi bi-cash-stack"></i>
+                                                    <span>Amount</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="bi bi-receipt"></i>
+                                                    <span>Fee</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="bi bi-send"></i>
+                                                    <span>Destination</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="bi bi-check2-circle"></i>
+                                                    <span>Status</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="bi bi-hash"></i>
+                                                    <span>TX ID</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <span>Actions</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($transactions as $transaction)
+                                        <tr class="transaction-row-premium">
+                                            <td>
+                                                <div class="date-cell">
+                                                    <div class="date-primary">{{ $transaction->created_at->format('M d, Y') }}</div>
+                                                    <div class="date-secondary">{{ $transaction->created_at->format('h:i A') }}</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="type-cell">
+                                                    <div class="type-icon-premium {{ $transaction->type }}">
+                                                        @if($transaction->type == 'deposit')
+                                                            <i class="bi bi-arrow-down-circle-fill"></i>
+                                                        @elseif($transaction->type == 'withdrawal')
+                                                            <i class="bi bi-arrow-up-circle-fill"></i>
+                                                        @elseif($transaction->type == 'staking')
+                                                            <i class="bi bi-lock-fill"></i>
+                                                        @elseif($transaction->type == 'reward')
+                                                            <i class="bi bi-gift-fill"></i>
+                                                        @else
+                                                            <i class="bi bi-unlock-fill"></i>
+                                                        @endif
+                                                    </div>
+                                                    <div class="type-info">
+                                                        <div class="type-name">{{ ucfirst($transaction->type) }}</div>
+                                                        <div class="type-subtitle">Transaction</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="coin-cell">
+                                                    <div class="coin-icon-premium">
+                                                        <i class="bi bi-currency-bitcoin"></i>
+                                                    </div>
+                                                    <span class="coin-name">{{ $transaction->coin_type }}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="amount-cell">
+                                                    <div class="amount-primary {{ in_array($transaction->type, ['deposit', 'reward']) ? 'positive' : 'negative' }}">
+                                                        @if(in_array($transaction->type, ['deposit', 'reward']))
+                                                            <i class="bi bi-plus-circle-fill"></i>
+                                                        @else
+                                                            <i class="bi bi-dash-circle-fill"></i>
+                                                        @endif
+                                                        <span>{{ number_format($transaction->amount, 8) }}</span>
+                                                    </div>
+                                                    <div class="amount-secondary">{{ $transaction->coin_type }}</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if($transaction->fee > 0)
+                                                <div class="fee-cell">
+                                                    <div class="fee-amount">{{ number_format($transaction->fee, 8) }}</div>
+                                                    <div class="fee-label">Network Fee</div>
+                                                </div>
+                                                @else
+                                                <span class="text-muted-premium">—</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="address-cell">
+                                                    <div class="address-label">
+                                                        @if($transaction->type == 'deposit')
+                                                            <i class="bi bi-arrow-down"></i> Received
+                                                        @elseif($transaction->type == 'withdrawal')
+                                                            <i class="bi bi-arrow-up"></i> Sent to
+                                                        @else
+                                                            <i class="bi bi-gear"></i> System
+                                                        @endif
+                                                    </div>
+                                                    <div class="address-value">
+                                                        {{ substr($transaction->to_address ?? 'Internal', 0, 10) }}...
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge-premium {{ $transaction->status }}">
+                                                    <span class="status-dot"></span>
+                                                    <span class="status-text">{{ ucfirst($transaction->status) }}</span>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="txid-cell">
+                                                    <button class="txid-copy" onclick="copyTxid('{{ $transaction->txid }}')" 
+                                                            title="Click to copy">
+                                                        <span class="txid-text">{{ substr($transaction->txid, 0, 8) }}...</span>
+                                                        <i class="bi bi-clipboard"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('transactions.show', $transaction->id) }}" 
+                                                   class="btn-action-premium">
+                                                    <i class="bi bi-eye-fill"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Grid View -->
+                        <div id="grid-view" class="view-container">
+                            <div class="transactions-grid">
+                                @foreach($transactions as $transaction)
+                                <div class="transaction-card-grid">
+                                    <div class="transaction-card-header-grid">
+                                        <div class="type-badge-grid {{ $transaction->type }}">
+                                            @if($transaction->type == 'deposit')
+                                                <i class="bi bi-arrow-down-circle-fill"></i>
+                                            @elseif($transaction->type == 'withdrawal')
+                                                <i class="bi bi-arrow-up-circle-fill"></i>
+                                            @elseif($transaction->type == 'staking')
+                                                <i class="bi bi-lock-fill"></i>
+                                            @elseif($transaction->type == 'reward')
+                                                <i class="bi bi-gift-fill"></i>
+                                            @else
+                                                <i class="bi bi-unlock-fill"></i>
+                                            @endif
+                                            <span>{{ ucfirst($transaction->type) }}</span>
+                                        </div>
+                                        <span class="status-badge-premium {{ $transaction->status }}">
+                                            <span class="status-dot"></span>
+                                            <span class="status-text">{{ ucfirst($transaction->status) }}</span>
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="transaction-amount-grid {{ in_array($transaction->type, ['deposit', 'reward']) ? 'positive' : 'negative' }}">
+                                        @if(in_array($transaction->type, ['deposit', 'reward']))
+                                            <i class="bi bi-plus-circle-fill"></i>
+                                        @else
+                                            <i class="bi bi-dash-circle-fill"></i>
+                                        @endif
+                                        <span>{{ number_format($transaction->amount, 8) }} {{ $transaction->coin_type }}</span>
+                                    </div>
+                                    
+                                    <div class="transaction-details-grid">
+                                        <div class="detail-item-grid">
+                                            <span class="detail-label-grid">Date</span>
+                                            <span class="detail-value-grid">{{ $transaction->created_at->format('M d, Y h:i A') }}</span>
+                                        </div>
+                                        <div class="detail-item-grid">
+                                            <span class="detail-label-grid">Fee</span>
+                                            <span class="detail-value-grid">{{ $transaction->fee > 0 ? number_format($transaction->fee, 8) : '—' }}</span>
+                                        </div>
+                                        <div class="detail-item-grid">
+                                            <span class="detail-label-grid">TX ID</span>
+                                            <span class="detail-value-grid">{{ substr($transaction->txid, 0, 12) }}...</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <a href="{{ route('transactions.show', $transaction->id) }}" class="btn-view-grid">
+                                        <span>View Details</span>
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        @if($transactions->hasPages())
+                        <div class="pagination-premium">
+                            {{ $transactions->links('pagination::bootstrap-5') }}
+                        </div>
+                        @endif
+                        
+                    @else
+                        <div class="empty-state-premium">
+                            <div class="empty-illustration-premium">
+                                <div class="empty-icon-premium">
+                                    <i class="bi bi-inbox"></i>
+                                </div>
+                                <div class="empty-circles-premium">
+                                    <div class="circle-premium circle-1"></div>
+                                    <div class="circle-premium circle-2"></div>
+                                    <div class="circle-premium circle-3"></div>
+                                </div>
+                            </div>
+                            <h3 class="empty-title-premium">No Transactions Found</h3>
+                            <p class="empty-description-premium">
+                                We couldn't find any transactions matching your current filters. 
+                                Try adjusting your search criteria or clearing all filters.
+                            </p>
+                            <a href="{{ route('transactions.index') }}" class="btn-empty-action-premium">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                                <span>Clear All Filters</span>
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
-/* Welcome Header */
-.welcome-header {
-    padding: 1.5rem;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    margin-bottom: 1.5rem;
+/* ===================================
+   CSS VARIABLES
+   =================================== */
+:root {
+    --color-bg: #0a0c10;
+    --color-bg-secondary: #0f1115;
+    --color-surface: #141820;
+    --color-surface-light: #1a1f2e;
+    --color-surface-hover: #252b3b;
+    --color-border: #1f2937;
+    --color-border-light: #2d3748;
+    
+    --color-text-primary: #f9fafb;
+    --color-text-secondary: #9ca3af;
+    --color-text-tertiary: #6b7280;
+    
+    --color-primary: #3b82f6;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-info: #6366f1;
+    
+    --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+    
+    --transition-fast: 150ms ease;
+    --transition-base: 200ms ease;
+    --transition-slow: 300ms ease;
 }
 
-.transaction-stats {
-    display: flex;
-    gap: 1rem;
+/* ===================================
+   BASE STYLES
+   =================================== */
+.transactions-page {
+    min-height: 100vh;
+    padding-bottom: 2rem;
 }
 
-.stat-badge {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 0.75rem 1.25rem;
-    text-align: center;
-    min-width: 80px;
-}
-
-.stat-badge small {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 0.25rem;
-}
-
-.stat-badge strong {
-    display: block;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-/* Filter Card */
-.filter-card-modern {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
+/* ===================================
+   ENHANCED HEADER
+   =================================== */
+.welcome-header-enhanced {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: 2rem;
     overflow: hidden;
+    margin-bottom: 2rem;
 }
 
-.filter-header {
+.header-content-wrapper {
+    position: relative;
+    z-index: 2;
+}
+
+.header-badge-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+}
+
+.gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.lead-description {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    max-width: 600px;
+    margin-bottom: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.stat-card-modern {
     display: flex;
     align-items: center;
     gap: 1rem;
+    padding: 1.25rem;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
 }
 
-.filter-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+.stat-card-modern:hover {
+    background: var(--color-surface-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    border-radius: var(--radius-md);
     font-size: 1.25rem;
+    color: white;
+    flex-shrink: 0;
 }
 
-/* Modern Input & Select */
-.input-modern {
-    margin-bottom: 0;
+.stat-icon-wrapper.primary {
+    background: var(--gradient-primary);
 }
 
-.input-modern .form-label {
-    font-size: 0.813rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
+.stat-icon-wrapper.success {
+    background: var(--gradient-success);
+}
+
+.stat-icon-wrapper.warning {
+    background: var(--gradient-warning);
+}
+
+.stat-details h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 0.25rem 0;
+    line-height: 1;
+}
+
+.stat-details p {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.header-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.1;
+}
+
+.glow-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--color-primary);
+    top: -200px;
+    right: -100px;
+}
+
+.glow-2 {
+    width: 300px;
+    height: 300px;
+    background: var(--color-success);
+    bottom: -150px;
+    left: -100px;
+}
+
+/* ===================================
+   FILTER CARD PREMIUM
+   =================================== */
+.filter-card-premium {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+}
+
+.filter-card-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-secondary);
 }
 
-.form-select-modern,
-.form-control-modern {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
-    color: var(--text-primary);
+.filter-title-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.filter-icon-modern {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-md);
+    font-size: 1.25rem;
+    color: white;
+}
+
+.filter-title-section h5 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.btn-toggle-filters {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-toggle-filters:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
+}
+
+.btn-toggle-filters i {
+    transition: transform var(--transition-base);
+}
+
+.btn-toggle-filters.active i {
+    transform: rotate(180deg);
+}
+
+.filter-card-body {
+    padding: 1.5rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.filter-card-body.active {
+    max-height: 800px;
+    padding: 1.5rem;
+}
+
+.filter-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 0.875rem;
-    transition: all 0.3s ease;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.form-select-premium {
     width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    appearance: none;
 }
 
-.form-select-modern:focus,
-.form-control-modern:focus {
-    background: var(--card-bg);
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    color: var(--text-primary);
+.form-select-premium:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Modern Table */
-.modern-table {
-    color: var(--text-primary);
+.select-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-tertiary);
+    pointer-events: none;
 }
 
-.modern-table thead th {
-    border-bottom: 1px solid var(--glass-border);
-    padding: 1rem 1.5rem;
+.form-input-premium {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+    transition: all var(--transition-base);
+}
+
+.form-input-premium:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    height: 100%;
+    padding-top: 1.75rem;
+}
+
+.btn-filter-apply {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
     font-weight: 600;
     font-size: 0.875rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all var(--transition-base);
 }
 
-.modern-table tbody td {
+.btn-filter-apply:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-filter-reset,
+.btn-filter-export {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-base);
+}
+
+.btn-filter-reset:hover,
+.btn-filter-export:hover {
+    background: var(--color-surface-hover);
+    transform: translateY(-2px);
+    color: var(--color-text-primary);
+}
+
+/* ===================================
+   TRANSACTIONS CARD
+   =================================== */
+.transactions-card-premium {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+}
+
+.transactions-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-secondary);
+}
+
+.transactions-card-header h5 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.view-switcher {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-surface-light);
+    padding: 0.25rem;
+    border-radius: var(--radius-md);
+}
+
+.view-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.view-btn:hover {
+    color: var(--color-text-primary);
+}
+
+.view-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.transactions-card-body {
+    padding: 0;
+}
+
+.view-container {
+    display: none;
+}
+
+.view-container.active {
+    display: block;
+}
+
+/* ===================================
+   TABLE PREMIUM
+   =================================== */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table-premium {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-premium thead th {
     padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--color-bg-secondary);
+    border-bottom: 2px solid var(--color-border);
+    text-align: left;
+}
+
+.th-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.transaction-row-premium {
+    border-bottom: 1px solid var(--color-border);
+    transition: all var(--transition-base);
+}
+
+.transaction-row-premium:hover {
+    background: var(--color-surface-light);
+}
+
+.transaction-row-premium td {
+    padding: 1.25rem 1.5rem;
     vertical-align: middle;
 }
 
-.modern-table tbody tr {
-    transition: all 0.3s ease;
+.date-cell {
+    min-width: 120px;
 }
 
-.modern-table tbody tr:hover {
-    background: var(--glass-bg);
+.date-primary {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
 }
 
-/* Transaction Row Components */
-.transaction-time {
-    min-width: 70px;
+.date-secondary {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
 }
 
-.transaction-type {
+.type-cell {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-.type-icon {
+.type-icon-premium {
     width: 40px;
     height: 40px;
-    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    border-radius: var(--radius-md);
+    font-size: 1.125rem;
+    flex-shrink: 0;
 }
 
-.type-icon.deposit {
-    background: rgba(0, 255, 136, 0.15);
-    color: var(--success);
+.type-icon-premium.deposit {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
 }
 
-.type-icon.withdrawal {
-    background: rgba(255, 51, 102, 0.15);
-    color: var(--danger);
+.type-icon-premium.withdrawal {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger);
 }
 
-.type-icon.staking {
-    background: rgba(255, 170, 0, 0.15);
-    color: var(--warning);
+.type-icon-premium.staking {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning);
 }
 
-.type-icon.reward {
-    background: rgba(67, 233, 123, 0.15);
-    color: #43e97b;
+.type-icon-premium.reward {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
 }
 
-.type-icon.unstaking {
-    background: rgba(102, 126, 234, 0.15);
-    color: #667eea;
+.type-icon-premium.unstaking {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--color-info);
 }
 
-.type-label {
-    font-weight: 600;
+.type-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.type-name {
     font-size: 0.875rem;
-    color: var(--text-primary);
+    font-weight: 600;
+    color: var(--color-text-primary);
 }
 
-.coin-badge {
+.type-subtitle {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+}
+
+.coin-cell {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
 }
 
-.coin-icon {
-    color: var(--warning);
+.coin-icon-premium {
+    font-size: 1rem;
+    color: var(--color-warning);
 }
 
-.coin-label {
-    font-size: 0.813rem;
+.coin-name {
+    font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--color-text-primary);
 }
 
-.transaction-amount {
-    min-width: 120px;
+.amount-cell {
+    min-width: 140px;
 }
 
-.amount-value {
-    font-size: 0.938rem;
-    font-weight: 600;
+.amount-primary {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
 }
 
-.amount-value.text-success {
-    color: var(--success) !important;
+.amount-primary.positive {
+    color: var(--color-success);
 }
 
-.transaction-fee {
-    min-width: 80px;
+.amount-primary.negative {
+    color: var(--color-text-primary);
 }
 
-.fee-value {
+.amount-secondary {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+}
+
+.fee-cell {
+    min-width: 100px;
+}
+
+.fee-amount {
     font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-primary);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
 }
 
-.transaction-address {
-    min-width: 120px;
+.fee-label {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
 }
 
-.address-truncated {
+.address-cell {
+    min-width: 140px;
+}
+
+.address-label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    margin-bottom: 0.25rem;
+}
+
+.address-value {
     font-family: 'Courier New', monospace;
     font-size: 0.813rem;
-    color: var(--text-primary);
-    word-break: break-all;
+    color: var(--color-text-primary);
 }
 
-.status-badge {
+.status-badge-premium {
     display: inline-flex;
     align-items: center;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-full);
     font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    text-transform: capitalize;
 }
 
-.status-badge.completed {
-    background: rgba(0, 255, 136, 0.15);
-    color: var(--success);
-    border: 1px solid rgba(0, 255, 136, 0.3);
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: pulse-status 2s ease-in-out infinite;
 }
 
-.status-badge.pending {
-    background: rgba(255, 170, 0, 0.15);
-    color: var(--warning);
-    border: 1px solid rgba(255, 170, 0, 0.3);
+@keyframes pulse-status {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
 
-.status-badge.failed {
-    background: rgba(255, 51, 102, 0.15);
-    color: var(--danger);
-    border: 1px solid rgba(255, 51, 102, 0.3);
+.status-badge-premium.completed {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.status-badge.cancelled {
-    background: rgba(108, 117, 125, 0.15);
-    color: var(--secondary);
-    border: 1px solid rgba(108, 117, 125, 0.3);
+.status-badge-premium.completed .status-dot {
+    background: var(--color-success);
 }
 
-.txid-truncated {
+.status-badge-premium.pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-badge-premium.pending .status-dot {
+    background: var(--color-warning);
+}
+
+.status-badge-premium.failed {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-badge-premium.failed .status-dot {
+    background: var(--color-danger);
+}
+
+.status-badge-premium.cancelled {
+    background: rgba(107, 114, 128, 0.15);
+    color: var(--color-text-tertiary);
+    border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.status-badge-premium.cancelled .status-dot {
+    background: var(--color-text-tertiary);
+}
+
+.txid-cell {
+    min-width: 120px;
+}
+
+.txid-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
     font-family: 'Courier New', monospace;
     font-size: 0.813rem;
-    color: var(--text-muted);
-    cursor: help;
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    cursor: pointer;
+    transition: all var(--transition-base);
 }
 
-.view-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+.txid-copy:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.btn-action-premium {
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
 }
 
-/* Pagination Modern */
-.pagination-modern {
+.btn-action-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: white;
+}
+
+.text-muted-premium {
+    color: var(--color-text-tertiary);
+    font-size: 0.875rem;
+}
+
+/* ===================================
+   GRID VIEW
+   =================================== */
+.transactions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
     padding: 1.5rem;
-    border-top: 1px solid var(--glass-border);
 }
 
-.pagination-modern .pagination {
-    margin-bottom: 0;
+.transaction-card-grid {
+    padding: 1.5rem;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+}
+
+.transaction-card-grid:hover {
+    background: var(--color-surface-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.transaction-card-header-grid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.type-badge-grid {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.type-badge-grid.deposit {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+}
+
+.type-badge-grid.withdrawal {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger);
+}
+
+.type-badge-grid.staking {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning);
+}
+
+.type-badge-grid.reward {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+}
+
+.type-badge-grid.unstaking {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--color-info);
+}
+
+.transaction-amount-grid {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.transaction-amount-grid.positive {
+    color: var(--color-success);
+}
+
+.transaction-amount-grid.negative {
+    color: var(--color-text-primary);
+}
+
+.transaction-details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detail-label-grid {
+    font-size: 0.875rem;
+    color: var(--color-text-tertiary);
+}
+
+.detail-value-grid {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.btn-view-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-base);
+}
+
+.btn-view-grid:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: white;
+}
+
+/* ===================================
+   PAGINATION
+   =================================== */
+.pagination-premium {
+    padding: 1.5rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.pagination-premium .pagination {
+    margin: 0;
     justify-content: center;
 }
 
-.pagination-modern .page-item .page-link {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-    border-radius: 8px;
+.pagination-premium .page-link {
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    border-radius: var(--radius-md);
     margin: 0 0.25rem;
-    transition: all 0.3s ease;
+    padding: 0.5rem 0.75rem;
+    transition: all var(--transition-base);
 }
 
-.pagination-modern .page-item.active .page-link {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.pagination-premium .page-item.active .page-link {
+    background: var(--gradient-primary);
     border-color: transparent;
     color: white;
 }
 
-.pagination-modern .page-item .page-link:hover {
-    background: var(--card-hover);
-    border-color: rgba(255, 255, 255, 0.2);
+.pagination-premium .page-link:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
-/* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-}
-
-.empty-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    display: inline-flex;
+/* ===================================
+   EMPTY STATE
+   =================================== */
+.empty-state-premium {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
-    color: var(--text-muted);
-    margin-bottom: 1rem;
+    padding: 4rem 2rem;
+    text-align: center;
 }
 
-/* Export Actions */
-.export-actions {
+.empty-illustration-premium {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.empty-icon-premium {
+    width: 120px;
+    height: 120px;
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-light);
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    font-size: 3rem;
+    color: var(--color-text-tertiary);
+    position: relative;
+    z-index: 2;
 }
 
-/* Responsive */
-@media (max-width: 992px) {
-    .transaction-type {
-        flex-direction: column;
-        gap: 0.5rem;
-        text-align: center;
+.empty-circles-premium {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+}
+
+.circle-premium {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: pulse-circle 3s ease-in-out infinite;
+}
+
+.circle-1 {
+    width: 140px;
+    height: 140px;
+}
+
+.circle-2 {
+    width: 160px;
+    height: 160px;
+    animation-delay: 0.5s;
+}
+
+.circle-3 {
+    width: 180px;
+    height: 180px;
+    animation-delay: 1s;
+}
+
+@keyframes pulse-circle {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
     }
-    
-    .type-label {
-        font-size: 0.75rem;
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.1;
     }
-    
-    .coin-badge {
-        padding: 0.375rem 0.5rem;
-        gap: 0.25rem;
-    }
-    
-    .modern-table thead th,
-    .modern-table tbody td {
-        padding: 0.75rem;
+}
+
+.empty-title-premium {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 0.75rem 0;
+}
+
+.empty-description-premium {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 0 2rem 0;
+}
+
+.btn-empty-action-premium {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-base);
+}
+
+.btn-empty-action-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: white;
+}
+
+/* ===================================
+   RESPONSIVE
+   =================================== */
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     }
 }
 
 @media (max-width: 768px) {
-    .welcome-header .d-flex {
+    .welcome-header-enhanced {
+        padding: 1.5rem;
+    }
+    
+    .lead-description {
+        font-size: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-card-header {
         flex-direction: column;
-        text-align: center;
+        align-items: flex-start;
         gap: 1rem;
     }
     
-    .transaction-stats {
-        justify-content: center;
+    .filter-actions {
+        flex-direction: column;
+        width: 100%;
+        padding-top: 0;
     }
     
-    .filter-header {
-        justify-content: center;
-        text-align: center;
+    .btn-filter-apply,
+    .btn-filter-reset,
+    .btn-filter-export {
+        width: 100%;
     }
     
-    .modern-table {
+    .transactions-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .transactions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-premium {
         font-size: 0.813rem;
     }
     
-    .transaction-time {
-        min-width: 60px;
+    .table-premium thead th,
+    .table-premium tbody td {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .display-5 {
+        font-size: 1.75rem;
     }
     
-    .amount-value {
-        font-size: 0.875rem;
+    .header-badge-modern {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
     }
 }
 </style>
+
+<script>
+// Toggle Filters
+function toggleFilters() {
+    const filterSection = document.getElementById('filter-section');
+    const toggleIcon = document.getElementById('filter-toggle-icon');
+    const toggleBtn = document.querySelector('.btn-toggle-filters');
+    
+    filterSection.classList.toggle('active');
+    toggleBtn.classList.toggle('active');
+}
+
+// Switch View (Table/Grid)
+function switchView(view) {
+    const tableView = document.getElementById('table-view');
+    const gridView = document.getElementById('grid-view');
+    const viewBtns = document.querySelectorAll('.view-btn');
+    
+    if (view === 'table') {
+        tableView.classList.add('active');
+        gridView.classList.remove('active');
+    } else {
+        gridView.classList.add('active');
+        tableView.classList.remove('active');
+    }
+    
+    viewBtns.forEach(btn => {
+        if (btn.dataset.view === view) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
+// Copy TXID to Clipboard
+function copyTxid(txid) {
+    navigator.clipboard.writeText(txid).then(() => {
+        // Show success feedback
+        const btn = event.currentTarget;
+        const originalHTML = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Copied!';
+        btn.style.borderColor = 'var(--color-success)';
+        btn.style.color = 'var(--color-success)';
+        
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.borderColor = '';
+            btn.style.color = '';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+    });
+}
+
+// Auto-open filters if any filter is active
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasFilters = Array.from(urlParams.keys()).some(key => 
+        ['type', 'coin_type', 'status', 'start_date', 'end_date'].includes(key) && urlParams.get(key)
+    );
+    
+    if (hasFilters) {
+        toggleFilters();
+    }
+});
+</script>
 @endsection

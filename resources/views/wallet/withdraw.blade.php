@@ -131,6 +131,8 @@
                                            required>
                                 </div>
                                 
+                                <!-- Memo Section - Hidden for USDT -->
+                                @if($wallet->coin_type !== 'USDT')
                                 <div class="memo-section">
                                     <label for="memo" class="form-label">
                                         <i class="bi bi-key me-2"></i>Memo (Optional)
@@ -141,14 +143,18 @@
                                                class="form-control-modern" 
                                                id="memo" 
                                                name="memo"
-                                               placeholder="Memo for the transaction"
+                                               placeholder="Enter memo/tag (if required by recipient)"
                                                maxlength="255">
                                     </div>
-                                    <small class="text-muted">
+                                    <small class="text-muted memo-hint">
                                         <i class="bi bi-info-circle me-1"></i>
-                                        Optional memo to identify this transaction
+                                        <span class="memo-hint-text">Some exchanges require a memo/tag for deposits. Check with your recipient.</span>
                                     </small>
                                 </div>
+                                @else
+                                <!-- Hidden memo field for USDT to maintain form structure -->
+                                <input type="hidden" name="memo" value="">
+                                @endif
                             </div>
                         </div>
                         
@@ -223,6 +229,18 @@
                                         </div>
                                     </div>
                                     
+                                    @if($wallet->coin_type !== 'USDT')
+                                    <div class="summary-item">
+                                        <div class="summary-label">
+                                            <i class="bi bi-key"></i>
+                                            <span>Memo</span>
+                                        </div>
+                                        <div class="summary-value address-value" id="reviewMemo">
+                                            None
+                                        </div>
+                                    </div>
+                                    @endif
+                                    
                                     <div class="summary-item">
                                         <div class="summary-label">
                                             <i class="bi bi-clock"></i>
@@ -240,7 +258,13 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="confirmDetails" required>
                                     <label class="form-check-label" for="confirmDetails">
-                                        I have verified the recipient address and amount
+                                        I have confirmed the 
+                                        @if($wallet->coin_type !== 'USDT')
+                                        <b>address and memo</b>
+                                        @else
+                                        <b>address</b>
+                                        @endif
+                                        are correct
                                     </label>
                                 </div>
                                 
@@ -366,6 +390,18 @@
                         <p class="mb-0">Always double-check the recipient address before submitting.</p>
                     </div>
                 </div>
+                
+                @if($wallet->coin_type !== 'USDT')
+                <div class="notice-item success">
+                    <div class="notice-item-icon">
+                        <i class="bi bi-key"></i>
+                    </div>
+                    <div class="notice-item-content">
+                        <h6>Memo/Tag Required</h6>
+                        <p class="mb-0">Some exchanges require a memo. Check with your recipient.</p>
+                    </div>
+                </div>
+                @endif
                 
                 <div class="notice-item success">
                     <div class="notice-item-icon">
@@ -785,6 +821,18 @@
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--glass-border);
+}
+
+.memo-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.memo-hint-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
 }
 
 /* Step Navigation Buttons */
@@ -1542,6 +1590,10 @@
     document.getElementById('amount').addEventListener('input', updateReview);
     document.getElementById('address').addEventListener('input', updateReview);
     
+    @if($wallet->coin_type !== 'USDT')
+    document.getElementById('memo').addEventListener('input', updateReview);
+    @endif
+    
     function updateReview() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
         const fee = 0.001;
@@ -1557,6 +1609,14 @@
             total.toFixed(3) + ' {{ $wallet->coin_type }}';
         document.getElementById('reviewAddress').textContent = 
             address.length > 30 ? address.substring(0, 30) + '...' : address;
+        
+        @if($wallet->coin_type !== 'USDT')
+        const memo = document.getElementById('memo').value;
+        const memoElement = document.getElementById('reviewMemo');
+        if (memoElement) {
+            memoElement.textContent = memo ? (memo.length > 20 ? memo.substring(0, 20) + '...' : memo) : 'None';
+        }
+        @endif
     }
     
     // Form submission

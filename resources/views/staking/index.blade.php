@@ -3,527 +3,2093 @@
 @section('title', 'Staking Pools')
 
 @section('content')
-<!-- Header -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="welcome-header">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div>
-                    <h1 class="display-6 fw-bold mb-2" style="background: linear-gradient(135deg, #ffffff 0%, #b4b4c8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                        Staking Pools <i class="bi bi-graph-up-arrow"></i>
-                    </h1>
-                    <p class="text-muted mb-0">
-                        <i class="bi bi-currency-exchange me-2"></i>Stake your crypto and earn rewards
-                    </p>
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="#active-stakes" class="btn btn-outline-primary">
-                        <i class="bi bi-lightning-charge me-2"></i>Active Stakes
-                    </a>
-                    <a href="#completed-stakes" class="btn btn-outline-primary">
-                        <i class="bi bi-clock-history me-2"></i>History
-                    </a>
+<div class="staking-page">
+    <div class="container-fluid px-4 py-4">
+        <!-- Enhanced Header with Stats -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="welcome-header-enhanced">
+                    <div class="header-content">
+                        <div class="header-text">
+                            <div class="header-badge mb-3">
+                                <i class="bi bi-graph-up-arrow"></i>
+                                <span>Staking Platform</span>
+                            </div>
+                            <h1 class="display-4 fw-bold mb-3">
+                                Earn Passive Income with <span class="gradient-text">Crypto Staking</span>
+                            </h1>
+                            <p class="lead-text mb-4">
+                                Stake your assets, earn rewards, and watch your portfolio grow with our secure and transparent staking pools.
+                            </p>
+                            <div class="header-actions">
+                                <a href="#pools-section" class="btn btn-primary-enhanced">
+                                    <i class="bi bi-rocket-takeoff"></i>
+                                    <span>Start Staking</span>
+                                </a>
+                                <a href="#active-stakes" class="btn btn-secondary-enhanced">
+                                    <i class="bi bi-lightning-charge"></i>
+                                    <span>My Stakes</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Stats Cards -->
+                        <div class="quick-stats">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="bi bi-currency-dollar"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>{{ number_format($pools->sum('total_staked'), 2) }}</h3>
+                                    <p>Total Value Locked</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon success">
+                                    <i class="bi bi-percent"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>{{ number_format($pools->max('apy'), 2) }}%</h3>
+                                    <p>Highest APY</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon warning">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>{{ number_format($pools->sum('total_stakers')) }}</h3>
+                                    <p>Active Stakers</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Decorative Elements -->
+                    <div class="header-decoration">
+                        <div class="glow glow-1"></div>
+                        <div class="glow glow-2"></div>
+                        <div class="glow glow-3"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Staking Pools Grid -->
-<div class="row g-4 mb-5">
-    @foreach($pools as $pool)
-    <div class="col-md-6 col-lg-4">
-        <div class="pool-card-modern">
-            <div class="apy-badge-modern">
-                <span class="apy-value">{{ number_format($pool->apy, 2) }}%</span>
-                <small>APY</small>
-            </div>
-            
-            <div class="pool-header mb-4">
-                <div class="pool-icon-wrapper" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
-                    <i class="bi {{ $pool->coin_icon ?? 'bi-currency-bitcoin' }}"></i>
-                </div>
-                <div class="pool-title">
-                    <h4 class="mb-1">{{ $pool->name }}</h4>
-                    <span class="badge bg-dark">{{ $pool->coin_type }}</span>
-                </div>
-            </div>
-            
-            <p class="pool-description mb-4">{{ $pool->description ?? 'Earn passive income by staking your crypto.' }}</p>
-            
-            <div class="pool-stats">
-                <div class="stat-row">
-                    <div class="stat-item">
-                        <small class="text-muted">Duration</small>
-                        <strong>{{ $pool->duration_text }}</strong>
+        <!-- Filter & Sort Section -->
+        <div class="row mb-4" id="pools-section">
+            <div class="col-12">
+                <div class="filter-bar">
+                    <div class="filter-section">
+                        <h5 class="filter-title">
+                            <i class="bi bi-funnel"></i>
+                            Available Pools
+                        </h5>
+                        <div class="filter-tags">
+                            <button class="filter-tag active">All Pools</button>
+                            <button class="filter-tag">High APY</button>
+                            <button class="filter-tag">Low Risk</button>
+                            <button class="filter-tag">Short Term</button>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <small class="text-muted">Min Stake</small>
-                        <strong>{{ number_format($pool->min_stake, 4) }}</strong>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-item">
-                        <small class="text-muted">Total Staked</small>
-                        <strong>{{ number_format($pool->total_staked, 2) }}</strong>
-                    </div>
-                    <div class="stat-item">
-                        <small class="text-muted">Stakers</small>
-                        <strong>{{ number_format($pool->total_stakers) }}</strong>
+                    <div class="sort-section">
+                        <select class="sort-select">
+                            <option>Sort by APY (High to Low)</option>
+                            <option>Sort by APY (Low to High)</option>
+                            <option>Sort by Duration</option>
+                            <option>Sort by Min Stake</option>
+                        </select>
                     </div>
                 </div>
             </div>
-            
-            <a href="{{ route('staking.show', $pool->id) }}" class="btn btn-primary w-100 mt-4">
-                <i class="bi bi-lock-fill me-2"></i>Stake Now
-            </a>
         </div>
-    </div>
-    @endforeach
-</div>
 
-<!-- Active Stakes -->
-<div id="active-stakes" class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <div>
-            <h5 class="mb-1">
-                <i class="bi bi-lightning-charge-fill me-2" style="color: #ffd700;"></i>Active Stakes
-            </h5>
-            <small class="text-muted">Track your ongoing investments</small>
+        <!-- Enhanced Staking Pools Grid -->
+        <div class="row g-4 mb-5">
+            @foreach($pools as $pool)
+            <div class="col-12 col-md-6 col-xl-4">
+                <div class="pool-card-premium">
+                    <!-- Card Header with Gradient -->
+                    <div class="pool-card-header">
+                        <div class="pool-badge-container">
+                            <div class="pool-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
+                                <i class="bi {{ $pool->coin_icon ?? 'bi-currency-bitcoin' }}"></i>
+                            </div>
+                            <div class="apy-badge-premium">
+                                <div class="apy-glow"></div>
+                                <div class="apy-content">
+                                    <span class="apy-number">{{ number_format($pool->apy, 2) }}%</span>
+                                    <span class="apy-label">APY</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pool-info">
+                            <h3 class="pool-name">{{ $pool->name }}</h3>
+                            <span class="pool-coin-badge">{{ $pool->coin_type }}</span>
+                        </div>
+                        
+                        <p class="pool-desc">{{ $pool->description ?? 'Earn passive income by staking your crypto with industry-leading returns.' }}</p>
+                    </div>
+                    
+                    <!-- Card Stats Grid -->
+                    <div class="pool-stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-icon-mini">
+                                <i class="bi bi-clock"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Duration</span>
+                                <span class="stat-value">{{ $pool->duration_text }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-box">
+                            <div class="stat-icon-mini">
+                                <i class="bi bi-wallet2"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Min Stake</span>
+                                <span class="stat-value">{{ number_format($pool->min_stake, 4) }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-box">
+                            <div class="stat-icon-mini">
+                                <i class="bi bi-lock"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Total Staked</span>
+                                <span class="stat-value">{{ number_format($pool->total_staked, 2) }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-box">
+                            <div class="stat-icon-mini">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Stakers</span>
+                                <span class="stat-value">{{ number_format($pool->total_stakers) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Card Footer with CTA -->
+                    <div class="pool-card-footer">
+                        <a href="{{ route('staking.show', $pool->id) }}" class="btn-stake-now">
+                            <span class="btn-text">Stake Now</span>
+                            <span class="btn-icon">
+                                <i class="bi bi-arrow-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                    
+                    <!-- Hover Effect -->
+                    <div class="card-shine"></div>
+                </div>
+            </div>
+            @endforeach
         </div>
-        <span class="badge bg-primary">{{ $activeStakes->count() }} Active</span>
-    </div>
-    <div class="card-body p-0">
-        @if($activeStakes->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-hover mb-0 modern-table">
-                    <thead>
-                        <tr>
-                            <th>Pool</th>
-                            <th>Amount</th>
-                            <th>Expected Reward</th>
-                            <th>Duration</th>
-                            <th>Progress</th>
-                            <th>Time Left</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+
+        <!-- Active Stakes Section -->
+        <div id="active-stakes" class="section-enhanced mb-5">
+            <div class="section-header-enhanced">
+                <div class="section-title-group">
+                    <div class="section-icon">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </div>
+                    <div>
+                        <h2 class="section-title">Active Stakes</h2>
+                        <p class="section-subtitle">Monitor your ongoing investments and rewards</p>
+                    </div>
+                </div>
+                <div class="section-badge">
+                    <span>{{ $activeStakes->count() }}</span> Active
+                </div>
+            </div>
+            
+            <div class="section-content">
+                @if($activeStakes->count() > 0)
+                    <div class="stakes-list">
                         @foreach($activeStakes as $stake)
-                        <tr class="stake-row">
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="coin-icon-badge">
+                        <div class="stake-item">
+                            <div class="stake-main">
+                                <div class="stake-pool-info">
+                                    <div class="stake-coin-icon">
                                         <i class="bi {{ $stake->stakingPool->coin_icon }}"></i>
                                     </div>
                                     <div>
-                                        <div class="fw-semibold">{{ $stake->stakingPool->name }}</div>
-                                        <small class="text-muted">{{ $stake->stakingPool->coin_type }}</small>
+                                        <h4 class="stake-pool-name">{{ $stake->stakingPool->name }}</h4>
+                                        <span class="stake-coin-type">{{ $stake->stakingPool->coin_type }}</span>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <div class="fw-semibold">{{ number_format($stake->amount, 4) }}</div>
-                                <small class="text-muted">Staked</small>
-                            </td>
-                            <td>
-                                <div class="fw-semibold text-success">{{ number_format($stake->expected_reward, 4) }}</div>
-                                <small class="text-muted">Reward</small>
-                            </td>
-                            <td>
-                                <span class="badge bg-dark">
-                                    {{ $stake->stakingPool->duration_text }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="progress-container">
-                                    <div class="progress modern-progress">
-                                        <div class="progress-bar" 
-                                             style="width: {{ $stake->progress_percentage }}%; background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);">
-                                        </div>
+                                
+                                <div class="stake-details-grid">
+                                    <div class="stake-detail">
+                                        <span class="detail-label">Staked Amount</span>
+                                        <span class="detail-value">{{ number_format($stake->amount, 4) }}</span>
                                     </div>
-                                    <small class="text-muted mt-1">{{ round($stake->progress_percentage) }}%</small>
+                                    
+                                    <div class="stake-detail">
+                                        <span class="detail-label">Expected Reward</span>
+                                        <span class="detail-value text-success-glow">
+                                            <i class="bi bi-trophy-fill"></i>
+                                            {{ number_format($stake->expected_reward, 4) }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="stake-detail">
+                                        <span class="detail-label">Duration</span>
+                                        <span class="detail-badge">{{ $stake->stakingPool->duration_text }}</span>
+                                    </div>
+                                    
+                                    <div class="stake-detail">
+                                        <span class="detail-label">Time Remaining</span>
+                                        <span class="detail-time">
+                                            <i class="bi bi-clock-fill"></i>
+                                            <span class="countdown-text" 
+                                                  data-end-date="{{ $stake->end_date->timestamp }}"
+                                                  data-start-date="{{ $stake->start_date->timestamp }}">
+                                                {{ $stake->remaining_time }}
+                                            </span>
+                                        </span>
+                                    </div>
                                 </div>
-                            </td>
-                            <td>
-                                <span class="time-badge">
-                                    <i class="bi bi-clock me-1"></i>{{ $stake->remaining_time }}
-                                </span>
-                            </td>
-                            <td>
+                            </div>
+                            
+                            <div class="stake-progress-section">
+                                <div class="progress-header">
+                                    <span class="progress-label">Progress</span>
+                                    <span class="progress-percentage" data-progress="{{ $stake->progress_percentage }}">{{ round($stake->progress_percentage) }}%</span>
+                                </div>
+                                <div class="progress-bar-modern">
+                                    <div class="progress-fill" 
+                                         style="width: {{ $stake->progress_percentage }}%"
+                                         data-end-date="{{ $stake->end_date->timestamp }}"
+                                         data-start-date="{{ $stake->start_date->timestamp }}">
+                                        <div class="progress-shine"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="stake-action">
                                 @if($stake->progress_percentage >= 100)
-                                <form action="{{ route('staking.claim', $stake->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('staking.claim', $stake->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="btn btn-success btn-sm">
-                                        <i class="bi bi-gift me-1"></i>Claim
+                                    <button type="submit" class="btn-claim">
+                                        <i class="bi bi-gift-fill"></i>
+                                        <span>Claim Rewards</span>
                                     </button>
                                 </form>
                                 @else
-                                <span class="badge bg-info">{{ $stake->remaining_time }}</span>
+                                <div class="status-pending">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    <span>In Progress</span>
+                                </div>
                                 @endif
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
                         @endforeach
-                    </tbody>
-                </table>
+                    </div>
+                @else
+                    <div class="empty-state-modern">
+                        <div class="empty-illustration">
+                            <div class="empty-icon-large">
+                                <i class="bi bi-lightning-charge"></i>
+                            </div>
+                            <div class="empty-circles">
+                                <div class="circle circle-1"></div>
+                                <div class="circle circle-2"></div>
+                                <div class="circle circle-3"></div>
+                            </div>
+                        </div>
+                        <h3 class="empty-title">No Active Stakes Yet</h3>
+                        <p class="empty-description">Start your staking journey and earn passive income on your crypto assets</p>
+                        <a href="#pools-section" class="btn-empty-action">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Browse Pools</span>
+                        </a>
+                    </div>
+                @endif
             </div>
-        @else
-            <div class="empty-state py-5">
-                <div class="empty-icon">
-                    <i class="bi bi-lightning-charge"></i>
-                </div>
-                <h5 class="mt-3 mb-2">No Active Stakes</h5>
-                <p class="text-muted mb-4">Start earning passive income by staking your crypto</p>
-                <a href="#pools-section" class="btn btn-primary">
-                    <i class="bi bi-rocket-takeoff me-2"></i>Browse Pools
-                </a>
-            </div>
-        @endif
-    </div>
-</div>
-
-<!-- Completed Stakes -->
-<div id="completed-stakes" class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <div>
-            <h5 class="mb-1">
-                <i class="bi bi-check-circle-fill me-2" style="color: #43e97b;"></i>Staking History
-            </h5>
-            <small class="text-muted">Completed stakes and rewards</small>
         </div>
-        <span class="badge bg-secondary">{{ $completedStakes->count() }} Total</span>
-    </div>
-    <div class="card-body p-0">
-        @if($completedStakes->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-hover mb-0 modern-table">
-                    <thead>
-                        <tr>
-                            <th>Pool</th>
-                            <th>Amount Staked</th>
-                            <th>Reward Earned</th>
-                            <th>End Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+
+        <!-- Completed Stakes Section -->
+        <div id="completed-stakes" class="section-enhanced">
+            <div class="section-header-enhanced">
+                <div class="section-title-group">
+                    <div class="section-icon success">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <div>
+                        <h2 class="section-title">Staking History</h2>
+                        <p class="section-subtitle">View your completed stakes and claimed rewards</p>
+                    </div>
+                </div>
+                <div class="section-badge secondary">
+                    <span>{{ $completedStakes->count() }}</span> Completed
+                </div>
+            </div>
+            
+            <div class="section-content">
+                @if($completedStakes->count() > 0)
+                    <div class="history-grid">
                         @foreach($completedStakes as $stake)
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="coin-icon-badge">
+                        <div class="history-card">
+                            <div class="history-header">
+                                <div class="history-pool">
+                                    <div class="history-icon">
                                         <i class="bi {{ $stake->stakingPool->coin_icon }}"></i>
                                     </div>
                                     <div>
-                                        <div class="fw-semibold">{{ $stake->stakingPool->name }}</div>
-                                        <small class="text-muted">{{ $stake->stakingPool->coin_type }}</small>
+                                        <h4>{{ $stake->stakingPool->name }}</h4>
+                                        <span>{{ $stake->stakingPool->coin_type }}</span>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <div class="fw-semibold">{{ number_format($stake->amount, 4) }}</div>
-                                <small class="text-muted">Principal</small>
-                            </td>
-                            <td>
                                 @if($stake->reward_claimed)
-                                <div class="fw-semibold text-success">
-                                    <i class="bi bi-check-circle me-1"></i>
-                                    {{ number_format($stake->actual_reward ?? $stake->expected_reward, 4) }}
+                                <div class="status-badge success">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Claimed
                                 </div>
-                                <small class="text-success">Claimed</small>
                                 @else
-                                <div class="fw-semibold text-warning">
-                                    {{ number_format($stake->expected_reward, 4) }}
+                                <div class="status-badge warning">
+                                    <i class="bi bi-clock-fill"></i>
+                                    Pending
                                 </div>
-                                <small class="text-warning">Pending</small>
                                 @endif
-                            </td>
-                            <td>
-                                <div class="fw-semibold">{{ $stake->end_date->format('M d, Y') }}</div>
-                                <small class="text-muted">{{ $stake->end_date->format('H:i') }}</small>
-                            </td>
-                            <td>
-                                @if($stake->reward_claimed)
-                                <span class="badge bg-success">Claimed</span>
-                                @else
-                                <form action="{{ route('staking.claim', $stake->id) }}" method="POST" class="d-inline">
+                            </div>
+                            
+                            <div class="history-stats">
+                                <div class="history-stat">
+                                    <span class="history-label">Amount Staked</span>
+                                    <span class="history-value">{{ number_format($stake->amount, 4) }}</span>
+                                </div>
+                                <div class="history-stat">
+                                    <span class="history-label">Reward Earned</span>
+                                    <span class="history-value reward">
+                                        {{ number_format($stake->actual_reward ?? $stake->expected_reward, 4) }}
+                                    </span>
+                                </div>
+                                <div class="history-stat">
+                                    <span class="history-label">Completed On</span>
+                                    <span class="history-value">{{ $stake->end_date->format('M d, Y') }}</span>
+                                </div>
+                            </div>
+                            
+                            @if(!$stake->reward_claimed)
+                            <div class="history-action">
+                                <form action="{{ route('staking.claim', $stake->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="btn btn-warning btn-sm">
-                                        <i class="bi bi-gift me-1"></i>Claim Reward
+                                    <button type="submit" class="btn-claim-small">
+                                        <i class="bi bi-gift-fill"></i>
+                                        Claim Reward
                                     </button>
                                 </form>
-                                @endif
-                            </td>
-                        </tr>
+                            </div>
+                            @endif
+                        </div>
                         @endforeach
-                    </tbody>
-                </table>
+                    </div>
+                @else
+                    <div class="empty-state-modern">
+                        <div class="empty-illustration">
+                            <div class="empty-icon-large">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="empty-circles">
+                                <div class="circle circle-1"></div>
+                                <div class="circle circle-2"></div>
+                                <div class="circle circle-3"></div>
+                            </div>
+                        </div>
+                        <h3 class="empty-title">No Staking History</h3>
+                        <p class="empty-description">Your completed stakes and rewards will appear here</p>
+                    </div>
+                @endif
             </div>
-        @else
-            <div class="empty-state py-5">
-                <div class="empty-icon">
-                    <i class="bi bi-clock-history"></i>
-                </div>
-                <h5 class="mt-3 mb-2">No Staking History</h5>
-                <p class="text-muted mb-4">Your completed stakes will appear here</p>
-            </div>
-        @endif
+        </div>
     </div>
 </div>
 
 <style>
-/* Welcome Header (from dashboard) */
-.welcome-header {
-    padding: 1.5rem;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    margin-bottom: 1.5rem;
+/* ===================================
+   CSS VARIABLES & ROOT STYLES
+   =================================== */
+:root {
+    /* Colors */
+    --color-bg: #0a0c10;
+    --color-bg-secondary: #0f1115;
+    --color-surface: #141820;
+    --color-surface-light: #1a1f2e;
+    --color-surface-hover: #252b3b;
+    --color-border: #1f2937;
+    --color-border-light: #2d3748;
+    
+    /* Text */
+    --color-text-primary: #f9fafb;
+    --color-text-secondary: #9ca3af;
+    --color-text-tertiary: #6b7280;
+    --color-text-disabled: #4b5563;
+    
+    /* Accents */
+    --color-primary: #3b82f6;
+    --color-primary-light: #60a5fa;
+    --color-primary-dark: #2563eb;
+    --color-success: #10b981;
+    --color-success-light: #34d399;
+    --color-warning: #f59e0b;
+    --color-warning-light: #fbbf24;
+    --color-danger: #ef4444;
+    --color-info: #6366f1;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    --gradient-dark: linear-gradient(180deg, #141820 0%, #0a0c10 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+    --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.3);
+    --shadow-glow-warning: 0 0 20px rgba(245, 158, 11, 0.3);
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-base: 200ms ease;
+    --transition-slow: 300ms ease;
+    --transition-slower: 500ms ease;
+    
+    /* Typography */
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
 }
 
-/* Modern Pool Cards */
-.pool-card-modern {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 1.5rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+/* Base Styles */
+.staking-page {
+    min-height: 100vh;
+    background: var(--color-bg);
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+}
+
+/* ===================================
+   ENHANCED HEADER SECTION
+   =================================== */
+.welcome-header-enhanced {
     position: relative;
+    background: var(--color-surface);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
     overflow: hidden;
-    height: 100%;
+    border: 1px solid var(--color-border);
 }
 
-.pool-card-modern:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+.header-content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
 }
 
-.apy-badge-modern {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    border-radius: 12px;
-    padding: 0.5rem 1rem;
-    text-align: center;
+.header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
     color: white;
-    font-weight: 700;
-    box-shadow: 0 8px 20px rgba(67, 233, 123, 0.3);
 }
 
-.apy-badge-modern .apy-value {
-    font-size: 1.25rem;
-    display: block;
-    line-height: 1;
+.header-badge i {
+    font-size: 1rem;
 }
 
-.apy-badge-modern small {
-    font-size: 0.75rem;
-    opacity: 0.9;
-    font-weight: 500;
+.gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-.pool-header {
+.lead-text {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    max-width: 600px;
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.btn-primary-enhanced {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-lg);
+    text-decoration: none;
+}
+
+.btn-primary-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+    color: white;
+}
+
+.btn-secondary-enhanced {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    color: var(--color-text-primary);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+}
+
+.btn-secondary-enhanced:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    color: var(--color-text-primary);
+}
+
+/* Quick Stats */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.stat-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
 }
 
-.pool-icon-wrapper {
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
+.stat-card:hover {
+    background: var(--color-surface-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.75rem;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-lg);
+    font-size: 1.5rem;
     color: white;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     flex-shrink: 0;
 }
 
-.pool-title h4 {
-    font-size: 1.25rem;
+.stat-icon.success {
+    background: var(--gradient-success);
+}
+
+.stat-icon.warning {
+    background: var(--gradient-warning);
+}
+
+.stat-info h3 {
+    font-size: 1.75rem;
     font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+    margin: 0 0 0.25rem 0;
 }
 
-.pool-description {
-    color: var(--text-muted);
+.stat-info p {
     font-size: 0.875rem;
-    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0;
 }
 
-.pool-stats {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 1rem;
-}
-
-.stat-row {
-    display: flex;
-    margin-bottom: 1rem;
-}
-
-.stat-row:last-child {
-    margin-bottom: 0;
-}
-
-.stat-item {
-    flex: 1;
-    text-align: center;
-    padding: 0 0.5rem;
-}
-
-.stat-item small {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 0.25rem;
-}
-
-.stat-item strong {
-    display: block;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-/* Modern Table (from dashboard) */
-.modern-table {
-    color: var(--text-primary);
-}
-
-.modern-table thead th {
-    border-bottom: 1px solid var(--glass-border);
-    padding: 1rem 1.5rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.modern-table tbody td {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    vertical-align: middle;
-}
-
-.modern-table tbody tr {
-    transition: all 0.3s ease;
-}
-
-.modern-table tbody tr:hover {
-    background: var(--glass-bg);
-}
-
-.coin-icon-badge {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-}
-
-.modern-progress {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
+/* Header Decoration */
+.header-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
     overflow: hidden;
 }
 
-.modern-progress .progress-bar {
-    border-radius: 10px;
-    transition: width 0.6s ease;
-}
-
-.progress-container {
-    min-width: 100px;
-}
-
-.time-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.4rem 0.8rem;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    font-size: 0.813rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-}
-
-/* Empty State (from dashboard) */
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-}
-
-.empty-icon {
-    width: 80px;
-    height: 80px;
+.glow {
+    position: absolute;
     border-radius: 50%;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    display: inline-flex;
+    filter: blur(80px);
+    opacity: 0.15;
+}
+
+.glow-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--color-primary);
+    top: -200px;
+    right: -100px;
+}
+
+.glow-2 {
+    width: 300px;
+    height: 300px;
+    background: var(--color-success);
+    bottom: -150px;
+    left: -100px;
+}
+
+.glow-3 {
+    width: 250px;
+    height: 250px;
+    background: var(--color-warning);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* ===================================
+   FILTER BAR
+   =================================== */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.filter-section {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    flex: 1;
+}
+
+.filter-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.filter-tags {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.filter-tag {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.filter-tag:hover {
+    background: var(--color-surface-light);
+    color: var(--color-text-primary);
+}
+
+.filter-tag.active {
+    background: var(--gradient-primary);
+    border-color: transparent;
+    color: white;
+}
+
+.sort-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    outline: none;
+    transition: all var(--transition-fast);
+}
+
+.sort-select:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+}
+
+/* ===================================
+   PREMIUM POOL CARDS
+   =================================== */
+.pool-card-premium {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    transition: all var(--transition-slow);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.pool-card-premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.pool-card-premium:hover {
+    transform: translateY(-8px);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-2xl), var(--shadow-glow);
+}
+
+.pool-card-premium:hover::before {
+    opacity: 1;
+}
+
+.pool-card-header {
+    padding: var(--spacing-xl);
+}
+
+.pool-badge-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+}
+
+.pool-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
-    color: var(--text-muted);
-    margin-bottom: 1rem;
+    border-radius: var(--radius-lg);
+    font-size: 2rem;
+    color: white;
+    box-shadow: var(--shadow-lg);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .pool-header {
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
+.apy-badge-premium {
+    position: relative;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--gradient-success);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-success);
+}
+
+.apy-glow {
+    position: absolute;
+    inset: -2px;
+    background: var(--gradient-success);
+    border-radius: var(--radius-lg);
+    filter: blur(8px);
+    opacity: 0.5;
+    z-index: -1;
+}
+
+.apy-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.apy-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1;
+}
+
+.apy-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.pool-info {
+    margin-bottom: var(--spacing-md);
+}
+
+.pool-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.pool-coin-badge {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.pool-desc {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.pool-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.stat-box {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.stat-icon-mini {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.stat-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    margin-bottom: 2px;
+}
+
+.stat-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.pool-card-footer {
+    padding: var(--spacing-xl);
+    margin-top: auto;
+}
+
+.btn-stake-now {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: var(--spacing-md);
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-stake-now::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-stake-now:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-stake-now:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    color: white;
+}
+
+.btn-text {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-icon {
+    position: relative;
+    z-index: 1;
+    transition: transform var(--transition-base);
+}
+
+.btn-stake-now:hover .btn-icon {
+    transform: translateX(4px);
+}
+
+.card-shine {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.03) 50%,
+        transparent 70%
+    );
+    transform: rotate(45deg);
+    pointer-events: none;
+    transition: all 0.6s ease;
+    opacity: 0;
+}
+
+.pool-card-premium:hover .card-shine {
+    opacity: 1;
+    animation: shine 1.5s ease-in-out infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
     }
-    
-    .pool-icon-wrapper {
-        width: 70px;
-        height: 70px;
-        font-size: 2rem;
-    }
-    
-    .apy-badge-modern {
-        position: relative;
-        top: 0;
-        right: 0;
-        display: inline-block;
-        margin-bottom: 1rem;
-    }
-    
-    .stat-row {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    .stat-item {
-        text-align: left;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .modern-table {
-        font-size: 0.875rem;
-    }
-    
-    .modern-table thead th,
-    .modern-table tbody td {
-        padding: 0.75rem;
+    100% {
+        transform: translateX(100%) rotate(45deg);
     }
 }
+
+/* ===================================
+   SECTION ENHANCED
+   =================================== */
+.section-enhanced {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+}
+
+.section-header-enhanced {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-secondary);
+}
+
+.section-title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.section-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-md);
+    font-size: 1.25rem;
+    color: white;
+}
+
+.section-icon.success {
+    background: var(--gradient-success);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.section-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+}
+
+.section-badge.secondary {
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+.section-badge span {
+    font-size: 1rem;
+}
+
+.section-content {
+    padding: var(--spacing-xl);
+}
+
+/* ===================================
+   STAKES LIST
+   =================================== */
+.stakes-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.stake-item {
+    padding: var(--spacing-xl);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+}
+
+.stake-item:hover {
+    background: var(--color-surface-light);
+    border-color: var(--color-primary);
+    transform: translateX(4px);
+}
+
+.stake-main {
+    margin-bottom: var(--spacing-lg);
+}
+
+.stake-pool-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.stake-coin-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-lg);
+    font-size: 1.75rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stake-pool-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.stake-coin-type {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.stake-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.stake-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.detail-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.text-success-glow {
+    color: var(--color-success-light);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.detail-badge {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    width: fit-content;
+}
+
+.detail-time {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary-light);
+    animation: timeCountdown 2s ease-in-out infinite;
+}
+
+.detail-time i {
+    animation: spin 4s linear infinite;
+}
+
+.countdown-text {
+    position: relative;
+    display: inline-block;
+}
+
+.countdown-text::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--color-primary-light);
+    animation: countdown-underline 3s ease-in-out infinite;
+}
+
+@keyframes countdown-underline {
+    0%, 100% {
+        transform: scaleX(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scaleX(0.7);
+        opacity: 0.8;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.stake-progress-section {
+    padding: var(--spacing-lg);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.stake-progress-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle,
+        rgba(16, 185, 129, 0.03) 0%,
+        transparent 70%
+    );
+    animation: progress-bg-pulse 4s ease-in-out infinite;
+}
+
+@keyframes progress-bg-pulse {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translate(-10%, -10%) scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+    position: relative;
+    z-index: 1;
+}
+
+.progress-header::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: var(--color-success);
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    50% {
+        opacity: 0.7;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0);
+    }
+}
+
+.progress-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.progress-percentage {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    animation: timeCountdown 2s ease-in-out infinite;
+}
+
+.progress-bar-modern {
+    height: 12px;
+    background: var(--color-surface-light);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-success);
+    border-radius: var(--radius-full);
+    position: relative;
+    transition: width var(--transition-slow);
+    animation: progressPulse 3s ease-in-out infinite, progressIncrement 2s ease-in-out infinite;
+    transform-origin: left center;
+}
+
+.progress-shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -2px;
+    width: 4px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 0 var(--radius-full) var(--radius-full) 0;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    animation: edge-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes edge-glow {
+    0%, 100% {
+        opacity: 0.6;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes progressPulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+    }
+}
+
+@keyframes timeCountdown {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes progressIncrement {
+    0% {
+        transform: scaleX(0.99);
+    }
+    50% {
+        transform: scaleX(1.001);
+    }
+    100% {
+        transform: scaleX(0.99);
+    }
+}
+
+.stake-action {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-claim {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: var(--gradient-success);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-claim:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-success);
+}
+
+.status-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    position: relative;
+    overflow: hidden;
+}
+
+.status-pending::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(59, 130, 246, 0.1),
+        transparent
+    );
+    animation: status-sweep 3s ease-in-out infinite;
+}
+
+.status-pending i {
+    animation: hourglass-rotate 2s ease-in-out infinite;
+}
+
+@keyframes status-sweep {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes hourglass-rotate {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+}
+
+/* ===================================
+   HISTORY GRID
+   =================================== */
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.history-card {
+    padding: var(--spacing-lg);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+}
+
+.history-card:hover {
+    background: var(--color-surface-light);
+    border-color: var(--color-primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.history-pool {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.history-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-md);
+    font-size: 1.25rem;
+    color: white;
+}
+
+.history-pool h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.history-pool span {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge.success {
+    background: var(--gradient-success);
+    color: white;
+}
+
+.status-badge.warning {
+    background: var(--gradient-warning);
+    color: white;
+}
+
+.history-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.history-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.history-label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.history-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.history-value.reward {
+    color: var(--color-success-light);
+}
+
+.history-action {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.btn-claim-small {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--gradient-warning);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-claim-small:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md), var(--shadow-glow-warning);
+}
+
+/* ===================================
+   EMPTY STATE
+   =================================== */
+.empty-state-modern {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    text-align: center;
+}
+
+.empty-illustration {
+    position: relative;
+    margin-bottom: var(--spacing-xl);
+}
+
+.empty-icon-large {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-light);
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    font-size: 3rem;
+    color: var(--color-text-tertiary);
+    position: relative;
+    z-index: 2;
+    transition: all var(--transition-slow);
+}
+
+.empty-state-modern:hover .empty-icon-large {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    transform: scale(1.1) rotate(10deg);
+}
+
+.empty-circles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+}
+
+.circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.circle-1 {
+    width: 140px;
+    height: 140px;
+    animation-delay: 0s;
+}
+
+.circle-2 {
+    width: 160px;
+    height: 160px;
+    animation-delay: 0.5s;
+}
+
+.circle-3 {
+    width: 180px;
+    height: 180px;
+    animation-delay: 1s;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.1;
+    }
+}
+
+.empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.empty-description {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--spacing-xl) 0;
+    max-width: 400px;
+}
+
+.btn-empty-action {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+}
+
+.btn-empty-action:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    color: white;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+@media (max-width: 1200px) {
+    .header-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-stats {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-header-enhanced {
+        padding: var(--spacing-xl);
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-primary-enhanced,
+    .btn-secondary-enhanced {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .quick-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .filter-section {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .sort-section {
+        width: 100%;
+    }
+    
+    .sort-select {
+        width: 100%;
+    }
+    
+    .pool-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stake-details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .history-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-header-enhanced {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-header-enhanced {
+        padding: var(--spacing-lg);
+    }
+    
+    .display-4 {
+        font-size: 1.75rem;
+    }
+    
+    .lead-text {
+        font-size: 1rem;
+    }
+    
+    .pool-card-premium {
+        border-radius: var(--radius-xl);
+    }
+    
+    .pool-card-header,
+    .pool-card-footer {
+        padding: var(--spacing-lg);
+    }
+    
+    .pool-stats-grid {
+        padding: var(--spacing-md);
+    }
+    
+    .section-enhanced {
+        border-radius: var(--radius-xl);
+    }
+    
+    .section-content {
+        padding: var(--spacing-lg);
+    }
+    
+    .stake-item {
+        padding: var(--spacing-lg);
+    }
+}
+
+/* ===================================
+   CUSTOM SCROLLBAR
+   =================================== */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-border-light);
+}
+
+/* ===================================
+   UTILITIES
+   =================================== */
+.text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-success {
+    background: var(--gradient-success);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Function to format time remaining
+    function formatTimeRemaining(seconds) {
+        if (seconds <= 0) {
+            return 'Completed';
+        }
+        
+        const days = Math.floor(seconds / (24 * 60 * 60));
+        const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+        const minutes = Math.floor((seconds % (60 * 60)) / 60);
+        const secs = Math.floor(seconds % 60);
+        
+        if (days > 0) {
+            return `${days}d ${hours}h ${minutes}m`;
+        } else if (hours > 0) {
+            return `${hours}h ${minutes}m ${secs}s`;
+        } else if (minutes > 0) {
+            return `${minutes}m ${secs}s`;
+        } else {
+            return `${secs}s`;
+        }
+    }
+    
+    // Function to calculate progress percentage
+    function calculateProgress(startTimestamp, endTimestamp) {
+        const now = Math.floor(Date.now() / 1000);
+        const totalDuration = endTimestamp - startTimestamp;
+        const elapsed = now - startTimestamp;
+        const progress = (elapsed / totalDuration) * 100;
+        
+        return Math.min(Math.max(progress, 0), 100);
+    }
+    
+    // Update all countdowns and progress bars
+    function updateAll() {
+        const now = Math.floor(Date.now() / 1000);
+        
+        // Update countdown timers
+        document.querySelectorAll('.countdown-text').forEach(function(element) {
+            const endDate = parseInt(element.getAttribute('data-end-date'));
+            const timeRemaining = endDate - now;
+            
+            if (timeRemaining > 0) {
+                element.textContent = formatTimeRemaining(timeRemaining);
+                element.style.color = 'var(--color-primary-light)';
+            } else {
+                element.textContent = 'Completed';
+                element.style.color = 'var(--color-success)';
+            }
+        });
+        
+        // Update progress bars
+        document.querySelectorAll('.progress-fill').forEach(function(element) {
+            const startDate = parseInt(element.getAttribute('data-start-date'));
+            const endDate = parseInt(element.getAttribute('data-end-date'));
+            
+            if (startDate && endDate) {
+                const progress = calculateProgress(startDate, endDate);
+                const progressPercentage = element.closest('.stake-progress-section').querySelector('.progress-percentage');
+                
+                // Smooth transition
+                element.style.width = progress.toFixed(2) + '%';
+                
+                if (progressPercentage) {
+                    progressPercentage.textContent = Math.round(progress) + '%';
+                }
+                
+                // Change color when completed
+                if (progress >= 100) {
+                    element.style.background = 'var(--gradient-success)';
+                    if (progressPercentage) {
+                        progressPercentage.style.color = 'var(--color-success)';
+                    }
+                }
+            }
+        });
+        
+        // Check for completed stakes and update action buttons
+        document.querySelectorAll('.stake-item').forEach(function(stakeItem) {
+            const progressFill = stakeItem.querySelector('.progress-fill');
+            const actionDiv = stakeItem.querySelector('.stake-action');
+            
+            if (progressFill && actionDiv) {
+                const startDate = parseInt(progressFill.getAttribute('data-start-date'));
+                const endDate = parseInt(progressFill.getAttribute('data-end-date'));
+                const progress = calculateProgress(startDate, endDate);
+                
+                if (progress >= 100) {
+                    const statusPending = actionDiv.querySelector('.status-pending');
+                    if (statusPending) {
+                        // Replace "In Progress" with "Claim" button
+                        actionDiv.innerHTML = `
+                            <button class="btn-claim" onclick="this.closest('form')?.submit() || window.location.reload()">
+                                <i class="bi bi-gift-fill"></i>
+                                <span>Claim Rewards</span>
+                            </button>
+                        `;
+                    }
+                }
+            }
+        });
+    }
+    
+    // Update immediately
+    updateAll();
+    
+    // Update every second for smooth countdown
+    setInterval(updateAll, 1000);
+    
+    // Add visual feedback when progress reaches milestones
+    setInterval(function() {
+        document.querySelectorAll('.progress-fill').forEach(function(element) {
+            const width = parseFloat(element.style.width);
+            
+            // Celebrate milestones
+            if (width >= 25 && width < 25.1) {
+                element.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.8)';
+                setTimeout(() => element.style.boxShadow = '', 500);
+            } else if (width >= 50 && width < 50.1) {
+                element.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.8)';
+                setTimeout(() => element.style.boxShadow = '', 500);
+            } else if (width >= 75 && width < 75.1) {
+                element.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.8)';
+                setTimeout(() => element.style.boxShadow = '', 500);
+            } else if (width >= 100) {
+                // Celebration effect when complete
+                element.style.boxShadow = '0 0 30px rgba(16, 185, 129, 1)';
+            }
+        });
+    }, 100);
+});
+</script>
 @endsection

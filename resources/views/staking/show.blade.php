@@ -3,302 +3,410 @@
 @section('title', 'Stake ' . $pool->name)
 
 @section('content')
-<!-- Header -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="welcome-header">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <a href="{{ route('staking.index') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-arrow-left"></i>
-                    </a>
-                    <div>
-                        <h1 class="display-6 fw-bold mb-2" style="background: linear-gradient(135deg, #ffffff 0%, #b4b4c8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                            Stake {{ $pool->name }}
-                        </h1>
-                        <p class="text-muted mb-0">
-                            <i class="bi bi-currency-bitcoin me-2"></i>Stake {{ $pool->coin_type }} and earn {{ number_format($pool->apy, 2) }}% APY
-                        </p>
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="welcome-header p-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-4">
+                    <div class="d-flex align-items-center gap-4">
+                        <a href="{{ route('staking.index') }}" class="btn-back d-flex align-items-center justify-content-center" aria-label="Back to staking">
+                            <i class="bi bi-arrow-left fs-4"></i>
+                        </a>
+                        <div>
+                            <h1 class="display-5 fw-semibold mb-2 text-white">
+                                Stake {{ $pool->name }}
+                            </h1>
+                            <p class="text-white-50 mb-0 fs-6">
+                                <i class="bi bi-currency-bitcoin me-2"></i>Stake {{ $pool->coin_type }} and earn <span class="text-success fw-medium">{{ number_format($pool->apy, 2) }}% APY</span>
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div class="apy-badge-modern">
-                    <span class="apy-value">{{ number_format($pool->apy, 2) }}%</span>
-                    <small>APY</small>
+                    <div class="apy-badge-modern d-flex flex-column align-items-center px-4 py-3">
+                        <span class="apy-value display-6 fw-bold text-white lh-1">{{ number_format($pool->apy, 2) }}%</span>
+                        <small class="small text-white-50 fw-medium">APY</small>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row g-4">
-    <!-- Main Content -->
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-body">
-                <!-- Pool Overview -->
-                <div class="row g-4 mb-5">
-                    <div class="col-md-6">
-                        <div class="pool-overview-card">
-                            <div class="pool-icon-large">
-                                <i class="bi {{ $pool->coin_icon ?? 'bi-currency-bitcoin' }}"></i>
+    <div class="row g-5">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card border-0">
+                <div class="card-body p-4">
+                    <!-- Pool Overview -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <div class="pool-overview-card d-flex align-items-center gap-4 p-4 h-100">
+                                <div class="pool-icon-large d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="bi {{ $pool->coin_icon ?? 'bi-currency-bitcoin' }} fs-1"></i>
+                                </div>
+                                <div class="pool-info">
+                                    <h3 class="fs-2 fw-semibold text-white mb-1">{{ $pool->coin_type }}</h3>
+                                    <p class="text-white-50 small mb-0">{{ $pool->name }} Pool</p>
+                                </div>
                             </div>
-                            <div class="pool-info">
-                                <h3 class="mb-1">{{ $pool->coin_type }}</h3>
-                                <p class="text-muted mb-0">{{ $pool->name }} Pool</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-grid h-100">
+                                <div class="stat-item-modern p-3 text-center">
+                                    <small class="d-block text-white-50 small fw-medium mb-2">Duration</small>
+                                    <strong class="d-block fs-5 fw-semibold text-white">{{ $pool->duration_text }}</strong>
+                                </div>
+                                <div class="stat-item-modern p-3 text-center">
+                                    <small class="d-block text-white-50 small fw-medium mb-2">Min Stake</small>
+                                    <strong class="d-block fs-5 fw-semibold text-white">{{ number_format($pool->min_stake, 4) }}</strong>
+                                </div>
+                                <div class="stat-item-modern p-3 text-center">
+                                    <small class="d-block text-white-50 small fw-medium mb-2">Max Stake</small>
+                                    <strong class="d-block fs-5 fw-semibold text-white">
+                                        @if($pool->max_stake)
+                                            {{ number_format($pool->max_stake, 4) }}
+                                        @else
+                                            Unlimited
+                                        @endif
+                                    </strong>
+                                </div>
+                                <div class="stat-item-modern p-3 text-center">
+                                    <small class="d-block text-white-50 small fw-medium mb-2">Total Staked</small>
+                                    <strong class="d-block fs-5 fw-semibold text-white">{{ number_format($pool->total_staked, 2) }}</strong>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="stats-grid">
-                            <div class="stat-item-modern">
-                                <small class="text-muted">Duration</small>
-                                <strong class="fs-5">{{ $pool->duration_text }}</strong>
+                    
+                    <!-- Staking Form -->
+                    <form action="{{ route('staking.stake', $pool->id) }}" method="POST">
+                        @csrf
+                        
+                        <!-- Amount Input -->
+                        <div class="input-modern mb-5">
+                            <label for="amount" class="form-label d-flex align-items-center gap-2 small fw-medium text-white-50 mb-2">
+                                <i class="bi bi-cash-stack"></i>Stake Amount
+                            </label>
+                            <div class="input-with-suffix position-relative">
+                                <input type="number" 
+                                       class="form-control-modern w-100" 
+                                       id="amount" 
+                                       name="amount" 
+                                       step="0.00000001"
+                                       min="{{ $pool->min_stake }}"
+                                       @if($pool->max_stake) max="{{ $pool->max_stake }}" @endif
+                                       placeholder="Enter amount to stake"
+                                       required>
+                                <span class="input-suffix position-absolute fw-medium">{{ $pool->coin_type }}</span>
                             </div>
-                            <div class="stat-item-modern">
-                                <small class="text-muted">Min Stake</small>
-                                <strong class="fs-5">{{ number_format($pool->min_stake, 4) }}</strong>
-                            </div>
-                            <div class="stat-item-modern">
-                                <small class="text-muted">Max Stake</small>
-                                <strong class="fs-5">
-                                    @if($pool->max_stake)
-                                        {{ number_format($pool->max_stake, 4) }}
+                            <div class="input-info d-flex align-items-center gap-2 small text-white-50 mt-2">
+                                <i class="bi bi-info-circle"></i>
+                                <span>Available: 
+                                    @if($wallet)
+                                        <span id="availableBalance" class="text-success fw-medium">{{ number_format($wallet->available_balance, 8) }}</span> {{ $pool->coin_type }}
                                     @else
-                                        Unlimited
+                                        <span class="text-danger">No wallet for {{ $pool->coin_type }}. Please create one first.</span>
                                     @endif
-                                </strong>
-                            </div>
-                            <div class="stat-item-modern">
-                                <small class="text-muted">Total Staked</small>
-                                <strong class="fs-5">{{ number_format($pool->total_staked, 2) }}</strong>
+                                </span>
                             </div>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Staking Form -->
-                <form action="{{ route('staking.stake', $pool->id) }}" method="POST">
-                    @csrf
-                    
-                    <!-- Amount Input -->
-                    <div class="input-modern mb-5">
-                        <label for="amount" class="form-label">
-                            <i class="bi bi-cash-stack me-2"></i>Stake Amount
-                        </label>
-                        <div class="input-with-suffix">
-                            <input type="number" 
-                                   class="form-control-modern" 
-                                   id="amount" 
-                                   name="amount" 
-                                   step="0.00000001"
-                                   min="{{ $pool->min_stake }}"
-                                   @if($pool->max_stake) max="{{ $pool->max_stake }}" @endif
-                                   placeholder="Enter amount to stake"
-                                   required>
-                            <span class="input-suffix">{{ $pool->coin_type }}</span>
-                        </div>
-                        <div class="input-info">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Available: 
-                            @if($wallet)
-                                <span id="availableBalance" class="text-success">{{ number_format($wallet->available_balance, 8) }}</span> {{ $pool->coin_type }}
-                            @else
-                                <span class="text-danger">No wallet for {{ $pool->coin_type }}. Please create one first.</span>
-                            @endif
-                        </div>
-                    </div>
-                    
-                    <!-- Reward Calculator -->
-                    <div class="reward-calculator-modern mb-5">
-                        <div class="calculator-header">
-                            <i class="bi bi-calculator-fill me-2"></i>
-                            <h6 class="mb-0">Reward Calculation</h6>
-                        </div>
-                        <div class="calculator-body">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="reward-card">
-                                        <small class="text-muted">Daily Reward</small>
-                                        <div class="reward-value" id="dailyReward">0</div>
-                                        <small class="text-muted">{{ $pool->coin_type }}/day</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="reward-card">
-                                        <small class="text-muted">Duration Reward</small>
-                                        <div class="reward-value" id="durationReward">0</div>
-                                        <small class="text-muted">{{ $pool->coin_type }} total</small>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="total-reward-card">
-                                        <div>
-                                            <small class="text-muted">Total Return</small>
-                                            <div class="total-reward-value" id="totalReward">0 {{ $pool->coin_type }}</div>
+                        
+                        <!-- Reward Calculator -->
+                        <div class="reward-calculator-modern mb-5">
+                            <div class="calculator-header d-flex align-items-center gap-2 px-4 py-3">
+                                <i class="bi bi-calculator-fill fs-5"></i>
+                                <h6 class="fs-6 fw-semibold text-white mb-0">Reward Calculation</h6>
+                            </div>
+                            <div class="calculator-body p-4">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="reward-card p-4 text-center">
+                                            <small class="d-block text-white-50 small fw-medium mb-3">Daily Reward</small>
+                                            <div class="reward-value fs-2 fw-bold text-white mb-2 font-monospace" id="dailyReward">0</div>
+                                            <small class="d-block text-white-50 small">{{ $pool->coin_type }}/day</small>
                                         </div>
-                                        <div class="apy-display">
-                                            <small class="text-muted">APY</small>
-                                            <div class="apy-value">{{ number_format($pool->apy, 2) }}%</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="reward-card p-4 text-center">
+                                            <small class="d-block text-white-50 small fw-medium mb-3">Duration Reward</small>
+                                            <div class="reward-value fs-2 fw-bold text-white mb-2 font-monospace" id="durationReward">0</div>
+                                            <small class="d-block text-white-50 small">{{ $pool->coin_type }} total</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="total-reward-card d-flex justify-content-between align-items-center p-4">
+                                            <div>
+                                                <small class="d-block text-white-50 small fw-medium mb-2">Total Return</small>
+                                                <div class="total-reward-value fs-2 fw-bold font-monospace" id="totalReward">0 {{ $pool->coin_type }}</div>
+                                            </div>
+                                            <div class="apy-display text-end">
+                                                <small class="d-block text-white-50 small fw-medium mb-2">APY</small>
+                                                <div class="apy-value fs-2 fw-bold text-white">{{ number_format($pool->apy, 2) }}%</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Submit Button -->
-                    @if($wallet && $wallet->available_balance >= $pool->min_stake)
-                    <button type="submit" class="btn btn-primary btn-lg w-100 stake-confirm-btn">
-                        <i class="bi bi-lock-fill me-2"></i>Confirm Stake
-                    </button>
-                    @elseif(!$wallet)
-                    <a href="{{ route('wallet.index') }}" class="btn btn-warning btn-lg w-100">
-                        <i class="bi bi-wallet me-2"></i>Create {{ $pool->coin_type }} Wallet First
-                    </a>
-                    @else
-                    <button type="button" class="btn btn-secondary btn-lg w-100" disabled>
-                        <i class="bi bi-x-circle me-2"></i>Insufficient Balance
-                    </button>
-                    @endif
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Sidebar -->
-    <div class="col-lg-4">
-        <!-- Information Card -->
-        <div class="card info-card-modern">
-            <div class="card-header d-flex align-items-center">
-                <div class="info-icon">
-                    <i class="bi bi-info-circle-fill"></i>
-                </div>
-                <h6 class="mb-0 ms-2">Staking Information</h6>
-            </div>
-            <div class="card-body">
-                <div class="info-item">
-                    <div class="info-icon-small">
-                        <i class="bi bi-clock-history"></i>
-                    </div>
-                    <div class="info-content">
-                        <small class="text-muted">How it works</small>
-                        <p class="mb-0">Your funds will be locked for {{ $pool->duration_text }}. After this period, you can claim your original stake plus rewards.</p>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="info-icon-small">
-                        <i class="bi bi-gift-fill"></i>
-                    </div>
-                    <div class="info-content">
-                        <small class="text-muted">Reward Distribution</small>
-                        <p class="mb-0">Rewards are calculated based on the APY and staking duration. Rewards are paid in the same cryptocurrency.</p>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="info-icon-small">
-                        <i class="bi bi-shield-lock-fill"></i>
-                    </div>
-                    <div class="info-content">
-                        <small class="text-muted">Security</small>
-                        <p class="mb-0">Your funds are secured using smart contracts. No one can access your staked funds except you.</p>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="info-icon-small">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                    </div>
-                    <div class="info-content">
-                        <small class="text-muted">Early Unstaking</small>
-                        <p class="mb-0">Early unstaking is not allowed. Funds remain locked until the staking period completes.</p>
-                    </div>
+                        
+                        <!-- Submit Button -->
+                        @if($wallet && $wallet->available_balance >= $pool->min_stake)
+                        <button type="submit" class="btn btn-primary btn-lg w-100 stake-confirm-btn d-inline-flex align-items-center justify-content-center gap-2 border-0 py-3 fw-medium">
+                            <i class="bi bi-lock-fill fs-5"></i>Confirm Stake
+                        </button>
+                        @elseif(!$wallet)
+                        <a href="{{ route('wallet.index') }}" class="btn btn-warning btn-lg w-100 d-inline-flex align-items-center justify-content-center gap-2 border-0 py-3 fw-medium">
+                            <i class="bi bi-wallet fs-5"></i>Create {{ $pool->coin_type }} Wallet First
+                        </a>
+                        @else
+                        <button type="button" class="btn btn-secondary btn-lg w-100 d-inline-flex align-items-center justify-content-center gap-2 border-0 py-3 fw-medium" disabled>
+                            <i class="bi bi-x-circle fs-5"></i>Insufficient Balance
+                        </button>
+                        @endif
+                    </form>
                 </div>
             </div>
         </div>
         
-        <!-- Wallet Card -->
-        @if($wallet)
-        <div class="card wallet-card-detail mt-4">
-            <div class="card-header d-flex align-items-center">
-                <div class="wallet-icon-small">
-                    <i class="bi bi-wallet2"></i>
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Information Card -->
+            <div class="card info-card-modern border-0 mb-4">
+                <div class="card-header d-flex align-items-center gap-3 bg-transparent border-0 px-4 pt-4 pb-0">
+                    <div class="info-icon d-flex align-items-center justify-content-center">
+                        <i class="bi bi-info-circle-fill fs-5"></i>
+                    </div>
+                    <h6 class="fs-6 fw-semibold text-white mb-0">Staking Information</h6>
                 </div>
-                <h6 class="mb-0 ms-2">Your {{ $pool->coin_type }} Wallet</h6>
+                <div class="card-body p-4">
+                    <div class="vstack gap-4">
+                        <div class="info-item d-flex gap-3">
+                            <div class="info-icon-small d-flex align-items-center justify-content-center flex-shrink-0">
+                                <i class="bi bi-clock-history fs-6"></i>
+                            </div>
+                            <div class="info-content">
+                                <small class="d-block text-white-50 small fw-medium mb-1">How it works</small>
+                                <p class="small text-white-50 mb-0">Your funds will be locked for {{ $pool->duration_text }}. After this period, you can claim your original stake plus rewards.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item d-flex gap-3">
+                            <div class="info-icon-small d-flex align-items-center justify-content-center flex-shrink-0">
+                                <i class="bi bi-gift-fill fs-6"></i>
+                            </div>
+                            <div class="info-content">
+                                <small class="d-block text-white-50 small fw-medium mb-1">Reward Distribution</small>
+                                <p class="small text-white-50 mb-0">Rewards are calculated based on the APY and staking duration. Rewards are paid in the same cryptocurrency.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item d-flex gap-3">
+                            <div class="info-icon-small d-flex align-items-center justify-content-center flex-shrink-0">
+                                <i class="bi bi-shield-lock-fill fs-6"></i>
+                            </div>
+                            <div class="info-content">
+                                <small class="d-block text-white-50 small fw-medium mb-1">Security</small>
+                                <p class="small text-white-50 mb-0">Your funds are secured using smart contracts. No one can access your staked funds except you.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item d-flex gap-3">
+                            <div class="info-icon-small d-flex align-items-center justify-content-center flex-shrink-0">
+                                <i class="bi bi-exclamation-triangle-fill fs-6"></i>
+                            </div>
+                            <div class="info-content">
+                                <small class="d-block text-white-50 small fw-medium mb-1">Early Unstaking</small>
+                                <p class="small text-white-50 mb-0">Early unstaking is not allowed. Funds remain locked until the staking period completes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="wallet-balance-detail">
-                    <div class="balance-item">
-                        <span>Available Balance</span>
-                        <strong>{{ number_format($wallet->available_balance, 8) }}</strong>
+            
+            <!-- Wallet Card -->
+            @if($wallet)
+            <div class="card wallet-card-detail border-0">
+                <div class="card-header d-flex align-items-center gap-3 bg-transparent border-0 px-4 pt-4 pb-0">
+                    <div class="wallet-icon-small d-flex align-items-center justify-content-center">
+                        <i class="bi bi-wallet2 fs-5"></i>
                     </div>
-                    <div class="balance-item">
-                        <span>Staked Balance</span>
-                        <strong>{{ number_format($wallet->staking_balance, 8) }}</strong>
-                    </div>
-                    <div class="balance-item">
-                        <span>Total Earned</span>
-                        <strong class="text-success">{{ number_format($wallet->total_earned, 8) }}</strong>
-                    </div>
+                    <h6 class="fs-6 fw-semibold text-white mb-0">Your {{ $pool->coin_type }} Wallet</h6>
                 </div>
-                <div class="wallet-address-detail mt-3">
-                    <small class="text-muted">Address</small>
-                    <div class="address-value">{{ substr($wallet->address, 0, 20) }}...</div>
+                <div class="card-body p-4">
+                    <div class="wallet-balance-detail vstack gap-3">
+                        <div class="balance-item d-flex justify-content-between align-items-center pb-2">
+                            <span class="small text-white-50">Available Balance</span>
+                            <strong class="small text-white fw-semibold">{{ number_format($wallet->available_balance, 8) }}</strong>
+                        </div>
+                        <div class="balance-item d-flex justify-content-between align-items-center pb-2">
+                            <span class="small text-white-50">Staked Balance</span>
+                            <strong class="small text-white fw-semibold">{{ number_format($wallet->staking_balance, 8) }}</strong>
+                        </div>
+                        <div class="balance-item d-flex justify-content-between align-items-center pb-2">
+                            <span class="small text-white-50">Total Earned</span>
+                            <strong class="small text-success fw-semibold">{{ number_format($wallet->total_earned, 8) }}</strong>
+                        </div>
+                    </div>
+                    <div class="wallet-address-detail p-3 mt-3">
+                        <small class="d-block text-white-50 small fw-medium mb-2">Address</small>
+                        <div class="address-value font-monospace small text-white">{{ substr($wallet->address, 0, 20) }}...</div>
+                    </div>
                 </div>
             </div>
+            @endif
         </div>
-        @endif
     </div>
 </div>
 
 <style>
+/* Modern Typography System */
+:root {
+    /* Font Families */
+    --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    
+    /* Font Sizes */
+    --text-xs: 0.75rem;    /* 12px */
+    --text-sm: 0.875rem;   /* 14px */
+    --text-base: 1rem;     /* 16px */
+    --text-lg: 1.125rem;   /* 18px */
+    --text-xl: 1.25rem;    /* 20px */
+    --text-2xl: 1.5rem;    /* 24px */
+    --text-3xl: 1.875rem;  /* 30px */
+    --text-4xl: 2.25rem;   /* 36px */
+    --text-5xl: 3rem;      /* 48px */
+    
+    /* Font Weights */
+    --weight-light: 300;
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+    
+    /* Line Heights */
+    --leading-tight: 1.2;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.75;
+    
+    /* Letter Spacing */
+    --tracking-tight: -0.02em;
+    --tracking-normal: 0;
+    --tracking-wide: 0.02em;
+    --tracking-wider: 0.05em;
+    
+    /* Colors */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.65);
+    --text-tertiary: rgba(255, 255, 255, 0.4);
+    
+    /* Backgrounds */
+    --bg-card: rgba(255, 255, 255, 0.03);
+    --bg-card-hover: rgba(255, 255, 255, 0.05);
+    --bg-glass: rgba(255, 255, 255, 0.02);
+    
+    /* Borders */
+    --border-light: rgba(255, 255, 255, 0.06);
+    --border-medium: rgba(255, 255, 255, 0.1);
+    --border-heavy: rgba(255, 255, 255, 0.15);
+}
+
+/* Base Typography */
+body {
+    font-family: var(--font-primary);
+    color: var(--text-primary);
+    line-height: var(--leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Font Utilities */
+.fs-xs { font-size: var(--text-xs); }
+.fs-sm { font-size: var(--text-sm); }
+.fs-base { font-size: var(--text-base); }
+.fs-lg { font-size: var(--text-lg); }
+.fs-xl { font-size: var(--text-xl); }
+.fs-2xl { font-size: var(--text-2xl); }
+.fs-3xl { font-size: var(--text-3xl); }
+.fs-4xl { font-size: var(--text-4xl); }
+.fs-5xl { font-size: var(--text-5xl); }
+
+.fw-light { font-weight: var(--weight-light); }
+.fw-normal { font-weight: var(--weight-normal); }
+.fw-medium { font-weight: var(--weight-medium); }
+.fw-semibold { font-weight: var(--weight-semibold); }
+.fw-bold { font-weight: var(--weight-bold); }
+
+.lh-tight { line-height: var(--leading-tight); }
+.lh-normal { line-height: var(--leading-normal); }
+.lh-relaxed { line-height: var(--leading-relaxed); }
+
+.tracking-tight { letter-spacing: var(--tracking-tight); }
+.tracking-normal { letter-spacing: var(--tracking-normal); }
+.tracking-wide { letter-spacing: var(--tracking-wide); }
+.tracking-wider { letter-spacing: var(--tracking-wider); }
+
+/* Text Colors */
+.text-white { color: var(--text-primary); }
+.text-white-50 { color: var(--text-secondary); }
+.text-white-25 { color: var(--text-tertiary); }
+
+/* Font Monospace */
+.font-monospace {
+    font-family: var(--font-mono);
+}
+
 /* Welcome Header */
 .welcome-header {
-    padding: 1.5rem;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: var(--bg-glass);
+    border: 1px solid var(--border-light);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+}
+
+.btn-back {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-medium);
+    transform: translateY(-1px);
+}
+
+/* APY Badge */
+.apy-badge-modern {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
     border-radius: 20px;
-    margin-bottom: 1.5rem;
+    min-width: 120px;
+    box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.3);
 }
 
 /* Pool Overview */
 .pool-overview-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    height: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 24px;
     transition: all 0.3s ease;
 }
 
 .pool-overview-card:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    background: var(--bg-card-hover);
+    border-color: var(--border-medium);
+    transform: translateY(-2px);
 }
 
 .pool-icon-large {
     width: 80px;
     height: 80px;
-    border-radius: 20px;
+    border-radius: 22px;
     background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
     color: white;
-    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
-}
-
-.pool-info h3 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.4);
 }
 
 /* Stats Grid */
@@ -306,344 +414,203 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
-    height: 100%;
 }
 
 .stat-item-modern {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 1rem;
-    text-align: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 18px;
+    transition: all 0.2s ease;
 }
 
-.stat-item-modern small {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
+.stat-item-modern:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-medium);
 }
 
-.stat-item-modern strong {
-    display: block;
-    font-size: 1.125rem;
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-/* Modern Input */
-.input-modern {
-    margin-bottom: 2rem;
-}
-
-.input-modern .form-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-}
-
-.input-with-suffix {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
+/* Form Elements */
 .form-control-modern {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
     padding: 1rem 1.5rem;
     color: var(--text-primary);
-    font-size: 1.125rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    flex: 1;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    transition: all 0.2s ease;
 }
 
 .form-control-modern:focus {
-    background: var(--card-bg);
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    color: var(--text-primary);
+    background: var(--bg-card-hover);
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-control-modern::placeholder {
+    color: var(--text-tertiary);
+    font-weight: var(--weight-normal);
 }
 
 .input-suffix {
-    position: absolute;
     right: 1.5rem;
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    pointer-events: none;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    font-size: var(--text-lg);
 }
 
 .input-info {
-    font-size: 0.813rem;
-    color: var(--text-muted);
-    margin-top: 0.5rem;
-    display: flex;
-    align-items: center;
+    font-size: var(--text-xs);
 }
 
 /* Reward Calculator */
 .reward-calculator-modern {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 24px;
     overflow: hidden;
 }
 
 .calculator-header {
-    background: linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    color: #43e97b;
-}
-
-.calculator-body {
-    padding: 1.5rem;
+    background: rgba(16, 185, 129, 0.05);
+    border-bottom: 1px solid var(--border-light);
+    color: #10b981;
 }
 
 .reward-card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    transition: all 0.2s ease;
 }
 
 .reward-card:hover {
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--bg-card-hover);
+    border-color: var(--border-medium);
     transform: translateY(-2px);
 }
 
 .reward-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0.5rem 0;
-    font-family: 'Courier New', monospace;
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-tight);
 }
 
 .total-reward-card {
-    background: linear-gradient(135deg, rgba(67, 233, 123, 0.15) 0%, rgba(56, 249, 215, 0.15) 100%);
-    border: 1px solid rgba(67, 233, 123, 0.3);
-    border-radius: 16px;
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
 }
 
 .total-reward-value {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #43e97b;
-    margin-top: 0.25rem;
+    color: #10b981;
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-tight);
 }
 
-.apy-display {
-    text-align: right;
-}
-
-.apy-display .apy-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
+.apy-value {
+    font-size: var(--text-2xl);
 }
 
 /* Info Card */
 .info-card-modern {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.info-card-modern .card-header {
-    background: rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 1rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
 }
 
 .info-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     color: white;
-    font-size: 1rem;
-}
-
-.info-item {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.info-item:last-child {
-    border-bottom: none;
 }
 
 .info-icon-small {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    flex-shrink: 0;
-    font-size: 0.875rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
 }
 
-.info-content {
-    flex: 1;
-}
-
-.info-content small {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 0.25rem;
-    font-weight: 600;
+.info-item:hover .info-icon-small {
+    background: var(--bg-card-hover);
+    border-color: var(--border-medium);
+    color: var(--text-primary);
 }
 
 .info-content p {
-    font-size: 0.813rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin: 0;
+    line-height: var(--leading-relaxed);
 }
 
-/* Wallet Card Detail */
+/* Wallet Card */
 .wallet-card-detail {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.wallet-card-detail .card-header {
-    background: rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 1rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
 }
 
 .wallet-icon-small {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     color: white;
-    font-size: 1rem;
-}
-
-.wallet-balance-detail {
-    padding: 0.5rem 0;
 }
 
 .balance-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-light);
 }
 
 .balance-item:last-child {
     border-bottom: none;
 }
 
-.balance-item span {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-}
-
 .balance-item strong {
-    font-size: 0.938rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-feature-settings: "tnum";
 }
 
 .wallet-address-detail {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
 }
 
 .address-value {
-    font-family: 'Courier New', monospace;
-    font-size: 0.813rem;
-    color: var(--text-primary);
-    margin-top: 0.25rem;
+    font-size: var(--text-xs);
     word-break: break-all;
 }
 
 /* Submit Button */
 .stake-confirm-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 14px;
-    padding: 1rem;
-    font-size: 1.125rem;
-    font-weight: 600;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    border-radius: 16px;
+    font-size: var(--text-lg);
     transition: all 0.3s ease;
 }
 
 .stake-confirm-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-}
-
-/* APY Badge */
-.apy-badge-modern {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    border-radius: 12px;
-    padding: 0.75rem 1.5rem;
-    text-align: center;
-    color: white;
-    font-weight: 700;
-    box-shadow: 0 8px 20px rgba(67, 233, 123, 0.3);
-}
-
-.apy-badge-modern .apy-value {
-    font-size: 1.5rem;
-    display: block;
-    line-height: 1;
-}
-
-.apy-badge-modern small {
-    font-size: 0.813rem;
-    opacity: 0.9;
-    font-weight: 500;
+    box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.5);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
+    .welcome-header .d-flex {
+        flex-direction: column;
+        text-align: center;
+    }
+    
     .pool-overview-card {
         flex-direction: column;
         text-align: center;
-        padding: 1.5rem;
     }
     
     .stats-grid {
@@ -654,21 +621,42 @@
         padding: 1rem;
     }
     
-    .reward-value {
-        font-size: 1.25rem;
-    }
-    
-    .total-reward-value {
-        font-size: 1.5rem;
+    .reward-value,
+    .total-reward-value,
+    .apy-value {
+        font-size: var(--text-xl);
     }
     
     .apy-badge-modern {
-        padding: 0.5rem 1rem;
+        width: 100%;
     }
     
-    .apy-badge-modern .apy-value {
-        font-size: 1.25rem;
+    .form-control-modern {
+        font-size: var(--text-base);
     }
+    
+    .input-suffix {
+        font-size: var(--text-base);
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-card);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-heavy);
 }
 </style>
 
@@ -677,13 +665,22 @@
     const apy = {{ $pool->apy }};
     const durationMinutes = {{ $pool->duration_minutes }};
     
+    function formatNumber(value) {
+        if (value === 0) return '0';
+        return value.toFixed(8).replace(/\.?0+$/, '');
+    }
+    
     function calculateRewards() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
         
-        if (amount <= 0) {
-            document.getElementById('durationReward').textContent = '0';
-            document.getElementById('dailyReward').textContent = '0';
-            document.getElementById('totalReward').textContent = '0 {{ $pool->coin_type }}';
+        const dailyRewardEl = document.getElementById('dailyReward');
+        const durationRewardEl = document.getElementById('durationReward');
+        const totalRewardEl = document.getElementById('totalReward');
+        
+        if (amount <= 0 || isNaN(amount)) {
+            dailyRewardEl.textContent = '0';
+            durationRewardEl.textContent = '0';
+            totalRewardEl.textContent = '0 {{ $pool->coin_type }}';
             return;
         }
         
@@ -695,18 +692,19 @@
         const durationInDays = durationMinutes / 1440; // Convert minutes to days
         const durationReward = amount * dailyRate * durationInDays;
         
-        // Total reward (same as duration reward for this calculation)
+        // Total reward
         const totalReward = durationReward;
         
-        document.getElementById('durationReward').textContent = durationReward.toFixed(8);
-        document.getElementById('dailyReward').textContent = dailyReward.toFixed(8);
-        document.getElementById('totalReward').textContent = totalReward.toFixed(8) + ' {{ $pool->coin_type }}';
+        dailyRewardEl.textContent = formatNumber(dailyReward);
+        durationRewardEl.textContent = formatNumber(durationReward);
+        totalRewardEl.textContent = formatNumber(totalReward) + ' {{ $pool->coin_type }}';
     }
     
-    document.getElementById('amount').addEventListener('input', calculateRewards);
-    
-    // Calculate on page load if there's a value
-    calculateRewards();
+    const amountInput = document.getElementById('amount');
+    if (amountInput) {
+        amountInput.addEventListener('input', calculateRewards);
+        calculateRewards();
+    }
 </script>
 @endpush
 @endsection

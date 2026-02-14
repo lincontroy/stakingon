@@ -64,9 +64,7 @@
                     <h2 class="stat-value">{{ number_format($stats['total_balance'], 8) }}</h2>
                     <p class="stat-description">Across all wallets</p>
                 </div>
-                <div class="stat-footer">
-                    <div class="sparkline" id="balance-sparkline"></div>
-                </div>
+               
             </div>
         </div>
         
@@ -86,9 +84,7 @@
                     <h2 class="stat-value">{{ number_format($stats['total_staking'], 8) }}</h2>
                     <p class="stat-description">Active stakes</p>
                 </div>
-                <div class="stat-footer">
-                    <div class="sparkline" id="staking-sparkline"></div>
-                </div>
+               
             </div>
         </div>
         
@@ -108,9 +104,7 @@
                     <h2 class="stat-value">{{ number_format($stats['total_earned'], 8) }}</h2>
                     <p class="stat-description">All-time rewards</p>
                 </div>
-                <div class="stat-footer">
-                    <div class="sparkline" id="earnings-sparkline"></div>
-                </div>
+               
             </div>
         </div>
         
@@ -130,9 +124,7 @@
                     <h2 class="stat-value">{{ $stats['active_stakes'] }}</h2>
                     <p class="stat-description">Running now</p>
                 </div>
-                <div class="stat-footer">
-                    <div class="sparkline" id="activity-sparkline"></div>
-                </div>
+               
             </div>
         </div>
     </div>
