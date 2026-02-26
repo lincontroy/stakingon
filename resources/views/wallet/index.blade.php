@@ -25,7 +25,7 @@
                         @php
                             $totalUsdValue = 0;
                             $usdRates = [
-                                'STEEM' => (float) (env('STEEMUSD') ?? 0.051),
+                                'STEEM' => (float) (env('STEEMUSD') ?? env('steemusd')),
                                 'HIVE' => (float) (env('HIVEUSD') ?? 0.0674),
                                 'USDT' => (float) (env('USDTUSD') ?? 1),
                             ];
@@ -57,7 +57,7 @@
             $usdRate = 0;
             if(in_array($wallet->coin_type, ['STEEM', 'HIVE', 'USDT'])) {
                 $usdRate = (float) (env($wallet->coin_type.'USD', 
-                    $wallet->coin_type == 'STEEM' ? 0.051 : 
+                    $wallet->coin_type == 'STEEM' ? env('steemusd') : 
                     ($wallet->coin_type == 'HIVE' ? 0.0674 : 1)
                 ));
             }
@@ -168,7 +168,7 @@
                     $usdRate = 0;
                     if(in_array($coin['type'], ['STEEM', 'HIVE', 'USDT'])) {
                         $usdRate = (float) (env($coin['type'].'USD', 
-                            $coin['type'] == 'STEEM' ? 0.051 : 
+                            $coin['type'] == 'STEEM' ? env('steemusd') : 
                             ($coin['type'] == 'HIVE' ? 0.0674 : 1)
                         ));
                     }
@@ -218,7 +218,7 @@
                                     @if(in_array($coin['type'], ['STEEM', 'HIVE', 'USDT']))
                                         @php
                                             $rate = env($coin['type'].'USD', 
-                                                $coin['type'] == 'STEEM' ? 0.051 : 
+                                                $coin['type'] == 'STEEM' ? env('steemusd') : 
                                                 ($coin['type'] == 'HIVE' ? 0.0674 : 1)
                                             );
                                         @endphp

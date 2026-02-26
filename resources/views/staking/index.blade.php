@@ -36,7 +36,7 @@
                         <!-- Quick Stats Cards -->
                         @php
                             $usdRates = [
-                                'STEEM' => (float) (env('STEEMUSD') ?? 0.051),
+                                'STEEM' => (float) (env('STEEMUSD') ?? env('steemusd')),
                                 'HIVE' => (float) (env('HIVEUSD') ?? 0.0674),
                                 'USDT' => (float) (env('USDTUSD') ?? 1),
                             ];

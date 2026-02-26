@@ -27,7 +27,7 @@
                         $usdRate = 0;
                         if(in_array($wallet->coin_type, ['STEEM', 'HIVE', 'USDT'])) {
                             $usdRate = (float) (env($wallet->coin_type.'USD', 
-                                $wallet->coin_type == 'STEEM' ? 0.051 : 
+                                $wallet->coin_type == 'STEEM' ? env('steemusd') : 
                                 ($wallet->coin_type == 'HIVE' ? 0.0674 : 1)
                             ));
                         }
