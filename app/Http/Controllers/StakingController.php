@@ -150,7 +150,7 @@ class StakingController extends Controller
             $actualReward = $stakingRecord->expected_reward+$stakingRecord->amount; // For simplicity, reward is amount + expected_reward
 
 
-            dd($actualReward);
+            // dd($actualReward);
             
             
             // Update staking record
