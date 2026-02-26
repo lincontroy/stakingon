@@ -42,7 +42,7 @@
                                 {{ number_format($wallet->available_balance, 4) }} {{ $wallet->coin_type }}
                             </strong>
                             @if($usdRate > 0)
-                            <small class="d-block mt-1 {{ $hasBalance ? 'text-success-light' : 'text-white-50' }}">
+                            <small class="d-block mt-1 {{ $hasBalance ? '' : 'text-white-50' }}">
                                 ≈ ${{ number_format($availableUsd, 2) }} USD
                             </small>
                             @endif
@@ -137,11 +137,11 @@
                                         <div class="balance-info">
                                             <i class="bi bi-wallet2 text-white-50"></i>
                                             <span class="text-white-50">Available:</span>
-                                            <strong class="{{ $hasBalance ? 'text-success' : 'text-white' }}">
+                                            <strong class="{{ $hasBalance ? 'text' : 'text-white' }}">
                                                 {{ number_format($wallet->available_balance, 4) }}
                                             </strong>
                                             @if($usdRate > 0)
-                                            <small class="{{ $hasBalance ? 'text-success-light' : 'text-white-50' }} d-none d-sm-inline">
+                                            <small class="{{ $hasBalance ? 'text' : 'text-white-50' }} d-none d-sm-inline">
                                                 (${{ number_format($availableUsd, 2) }})
                                             </small>
                                             @endif
@@ -246,7 +246,7 @@
                                         @if($usdRate > 0)
                                         <div class="summary-item">
                                             <span class="summary-label text-white-50">USD Value</span>
-                                            <span class="summary-value text-success" id="reviewUsdAmount">$0.00</span>
+                                            <span class="summary-value text" id="reviewUsdAmount">$0.00</span>
                                         </div>
                                         @endif
                                         
@@ -255,11 +255,14 @@
                                             <span class="summary-value text-white" id="reviewFee">2 USD</span>
                                         </div>
                                         
-                                       
+                                        
                                         
                                         <div class="summary-divider"></div>
                                         
-                                      
+                                        <div class="summary-item total">
+                                            <span class="summary-label fw-bold text-white-75">Total Deduction</span>
+                                            <span class="summary-value text-danger fw-bold" id="reviewTotal">0.001 {{ $wallet->coin_type }}</span>
+                                        </div>
                                         
                                         @if($usdRate > 0)
                                         <div class="summary-item">
@@ -1438,12 +1441,12 @@ body {
     
     function updateReview() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
-        const fee = 0.001;
+        const fee = 2;
         const total = amount + fee;
         const address = document.getElementById('address').value || 'Enter address';
         
         document.getElementById('reviewAmount').textContent = amount.toFixed(3) + ' {{ $wallet->coin_type }}';
-        document.getElementById('reviewFee').textContent = fee.toFixed(3) + ' {{ $wallet->coin_type }}';
+        document.getElementById('reviewFee').textContent = fee.toFixed(3) + 'USD';
         document.getElementById('reviewTotal').textContent = total.toFixed(3) + ' {{ $wallet->coin_type }}';
         document.getElementById('reviewAddress').textContent = address.length > 30 ? address.substring(0, 30) + '...' : address;
         
