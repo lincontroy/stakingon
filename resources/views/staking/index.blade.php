@@ -204,7 +204,7 @@
                             </div>
                             <div class="stat-details">
                                 <span class="stat-label">Stakers</span>
-                                <span class="stat-value">{{ number_format($pool->total_stakers) }}</span>
+                                <span class="stat-value">812+</span>
                             </div>
                         </div>
                     </div>
