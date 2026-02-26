@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use App\Models\Wallet;
 
@@ -50,21 +51,21 @@ class RegisteredUserController extends Controller
         $wallet1=Wallet::create([
             'user_id' => $user->id,
             'balance' => 0,
-            'address' => 'stakingonsteem',
+            'address' => Str::random(12),
             'coin_type' => 'STEEM',
         ]);
 
             $wallet2=Wallet::create([
                 'user_id' => $user->id,
                 'balance' => 0,
-                'address' => 'stakingonhive',
+                'address' => Str::random(12),
                 'coin_type' => 'HIVE',
             ]);
     
             $wallet3=Wallet::create([
                 'user_id' => $user->id,
                 'balance' => 0,
-                'address' => 'stakingonusdt',
+                'address' => Str::random(12),
                 'coin_type' => 'USDT',
             ]);
 
