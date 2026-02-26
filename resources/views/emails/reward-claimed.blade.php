@@ -107,7 +107,7 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="logo">
+      
         <div class="title">🎉 Reward Claimed Successfully!</div>
         <div class="subtitle">Your staking reward has been credited to your wallet</div>
     </div>
