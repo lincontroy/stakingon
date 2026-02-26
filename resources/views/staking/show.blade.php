@@ -310,10 +310,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="wallet-address-detail p-3 mt-3">
-                        <small class="d-block text-white-50 small fw-medium mb-2">Address</small>
-                        <div class="address-value font-monospace small text-white">{{ substr($wallet->address, 0, 20) }}...</div>
-                    </div>
+                    
                 </div>
             </div>
             @endif
