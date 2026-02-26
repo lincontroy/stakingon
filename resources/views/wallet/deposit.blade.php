@@ -105,11 +105,12 @@
                                 <div class="copy-field d-flex align-items-center gap-2 p-3" id="depositAccountField">
                                     <code class="flex-grow-1 small text-white bg-transparent border-0">
                                         @if($wallet->coin_type === 'HIVE')
-                                            stakeonhive
+                                            hivexpay
                                         @elseif($wallet->coin_type === 'USDT')
                                             THsZkYq3hcbDGE4pNPoyGns9nwp8swS84P
                                         @elseif($wallet->coin_type === 'STEEM')
                                             stakeonsteem
+                                        
                                         @endif
                                     </code>
                                     <button class="btn-copy d-flex align-items-center justify-content-center border-0" onclick="copyToClipboard('depositAccountField')" title="Copy to clipboard">
@@ -153,7 +154,7 @@
                                         <p class="small text-white-50 mb-3">Open your external wallet (Hive Keychain, Hive wallet, etc.)</p>
                                         <code class="d-inline-block p-2 small bg-black-30 rounded-3 border border-white-10">
                                             @if($wallet->coin_type === 'HIVE')
-                                                stakeonhive
+                                                hivexpay
                                             @elseif($wallet->coin_type === 'USDT')
                                                 THsZkYq3hcbDGE4pNPoyGns9nwp8swS84P
                                             @elseif($wallet->coin_type === 'STEEM')
@@ -309,15 +310,7 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="vstack gap-4">
-                        <div class="d-flex gap-3">
-                            <div class="notice-item-icon warning d-flex align-items-center justify-content-center flex-shrink-0">
-                                <i class="bi bi-key fs-6"></i>
-                            </div>
-                            <div>
-                                <h6 class="fs-6 fw-semibold text-white mb-1">MEMO Required</h6>
-                                <p class="small text-white-50 mb-0">Without the correct memo, funds may be lost permanently</p>
-                            </div>
-                        </div>
+                       
                         
                         <div class="d-flex gap-3">
                             <div class="notice-item-icon info d-flex align-items-center justify-content-center flex-shrink-0">
