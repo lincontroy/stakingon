@@ -147,7 +147,11 @@ class StakingController extends Controller
         
         try {
             // Calculate actual reward (could add dynamic calculation here)
-            $actualReward = $stakingRecord->expected_reward;
+            $actualReward = $stakingRecord->expected_reward+$stakingRecord->amount; // For simplicity, reward is amount + expected_reward
+
+
+            dd($actualReward);
+            
             
             // Update staking record
             $stakingRecord->status = 'completed';
