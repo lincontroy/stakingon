@@ -120,7 +120,7 @@
                                        @if($pool->max_stake) max="{{ $pool->max_stake }}" @endif
                                        placeholder="Enter amount to stake"
                                        required
-                                       oninput="updateUsdValue()">
+                                       oninput="updateUsdValue(); calculateRewards();">
                                 <span class="input-suffix position-absolute fw-medium">{{ $pool->coin_type }}</span>
                             </div>
                             @if($poolUsdRate > 0)
@@ -155,10 +155,29 @@
                                     <div class="col-12">
                                         <div class="total-reward-card d-flex justify-content-between align-items-center p-4">
                                             <div>
-                                                <small class="d-block text-white-50 small fw-medium mb-2">Total Return</small>
-                                                <div class="total-reward-value fs-2 fw-bold font-monospace" id="totalReward">0 {{ $pool->coin_type }}</div>
+                                                <small class="d-block text-white-50 small fw-medium mb-2">Returns</small>
+                                                <div class="total-reward-value fs-2 fw-bold font-monospace" id="returns">0 {{ $pool->coin_type }}</div>
                                                 @if($poolUsdRate > 0)
-                                                <small class="d-block text-white-50 small mt-1" id="totalRewardUsd">$0.00</small>
+                                                <small class="d-block text-white-50 small mt-1" id="returnsUsd">$0.00</small>
+                                                @endif
+                                            </div>
+                                            <div class="apy-display text-end">
+                                                <small class="d-block text-white-50 small fw-medium mb-2"></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <br>
+
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <div class="total-reward-card d-flex justify-content-between align-items-center p-4">
+                                            <div>
+                                                <small class="d-block text-white-50 small fw-medium mb-2">Total Return</small>
+                                                <div class="total-reward-value fs-2 fw-bold font-monospace" id="totalReturn">0 {{ $pool->coin_type }}</div>
+                                                @if($poolUsdRate > 0)
+                                                <small class="d-block text-white-50 small mt-1" id="totalReturnUsd">$0.00</small>
                                                 @endif
                                             </div>
                                             <div class="apy-display text-end">
@@ -756,28 +775,49 @@ body {
     
     function calculateRewards() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
-        const totalRewardEl = document.getElementById('totalReward');
-        const totalRewardUsdEl = document.getElementById('totalRewardUsd');
+        
+        // Get all the elements
+        const returnsEl = document.getElementById('returns');
+        const returnsUsdEl = document.getElementById('returnsUsd');
+        const totalReturnEl = document.getElementById('totalReturn');
+        const totalReturnUsdEl = document.getElementById('totalReturnUsd');
         
         if (amount <= 0 || isNaN(amount)) {
-            totalRewardEl.textContent = '0 {{ $pool->coin_type }}';
+            // Set all to zero if amount is invalid
+            if (returnsEl) returnsEl.textContent = '0 {{ $pool->coin_type }}';
+            if (totalReturnEl) totalReturnEl.textContent = '0 {{ $pool->coin_type }}';
             
             if (usdRate > 0) {
-                if (totalRewardUsdEl) totalRewardUsdEl.textContent = '$0.00';
+                if (returnsUsdEl) returnsUsdEl.textContent = '$0.00';
+                if (totalReturnUsdEl) totalReturnUsdEl.textContent = '$0.00';
             }
             return;
         }
         
-        // Calculate total reward based on APY
+        // Calculate reward (interest only)
         const apyDecimal = apy / 100;
-        const durationInYears = durationMinutes / (60 * 24 * 365); // Convert minutes to years
-        const totalReward = amount * apyDecimal;
+        const reward = amount * apyDecimal;
         
-        totalRewardEl.textContent = formatNumber(totalReward) + ' {{ $pool->coin_type }}';
+        // Calculate total return (principal + reward)
+        const totalReturn = amount + reward;
         
+        // Update Returns (interest only)
+        if (returnsEl) {
+            returnsEl.textContent = formatNumber(reward) + ' {{ $pool->coin_type }}';
+        }
+        
+        // Update Total Return (principal + interest)
+        if (totalReturnEl) {
+            totalReturnEl.textContent = formatNumber(totalReturn) + ' {{ $pool->coin_type }}';
+        }
+        
+        // Update USD values if rate exists
         if (usdRate > 0) {
-            const totalRewardUsd = totalReward * usdRate;
-            if (totalRewardUsdEl) totalRewardUsdEl.textContent = `$${totalRewardUsd.toFixed(2)}`;
+            const rewardUsd = reward * usdRate;
+            const totalReturnUsd = totalReturn * usdRate;
+            
+            if (returnsUsdEl) returnsUsdEl.textContent = `$${rewardUsd.toFixed(2)}`;
+            if (totalReturnUsdEl) totalReturnUsdEl.textContent = `$${totalReturnUsd.toFixed(2)}`;
         }
     }
     
@@ -787,6 +827,7 @@ body {
             calculateRewards();
             updateUsdValue();
         });
+        // Initial calculation
         calculateRewards();
         updateUsdValue();
     }
