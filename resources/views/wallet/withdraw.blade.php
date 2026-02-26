@@ -187,7 +187,7 @@
                                     @if($wallet->coin_type !== 'USDT')
                                     <div class="memo-section">
                                         <label for="memo" class="form-label text-white-75">
-                                            <i class="bi bi-key me-2 text-white-50"></i>Memo (Optional)
+                                            <i class="bi bi-key me-2 text-white-50"></i>Memo
                                         </label>
                                         <div class="input-with-icon">
                                             <i class="bi bi-chat-text input-icon text-white-50"></i>
@@ -252,15 +252,10 @@
                                         
                                         <div class="summary-item">
                                             <span class="summary-label text-white-50">Network Fee</span>
-                                            <span class="summary-value text-white" id="reviewFee">0.001 {{ $wallet->coin_type }}</span>
+                                            <span class="summary-value text-white" id="reviewFee">2 USD</span>
                                         </div>
                                         
-                                        @if($usdRate > 0)
-                                        <div class="summary-item">
-                                            <span class="summary-label text-white-50">Fee (USD)</span>
-                                            <span class="summary-value text-warning" id="reviewFeeUsd">$0.00</span>
-                                        </div>
-                                        @endif
+                                       
                                         
                                         <div class="summary-divider"></div>
                                         
