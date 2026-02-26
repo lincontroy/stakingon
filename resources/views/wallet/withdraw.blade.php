@@ -259,10 +259,7 @@
                                         
                                         <div class="summary-divider"></div>
                                         
-                                        <div class="summary-item total">
-                                            <span class="summary-label fw-bold text-white-75">Total Deduction</span>
-                                            <span class="summary-value text-danger fw-bold" id="reviewTotal">0.001 {{ $wallet->coin_type }}</span>
-                                        </div>
+                                      
                                         
                                         @if($usdRate > 0)
                                         <div class="summary-item">
