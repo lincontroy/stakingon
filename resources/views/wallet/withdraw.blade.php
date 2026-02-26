@@ -38,7 +38,7 @@
                     <div class="wallet-info-badge {{ $hasBalance ? 'has-balance' : '' }}">
                         <div class="balance-display">
                             <small class="text-white-75">Available Balance</small>
-                            <strong class="fs-4 {{ $hasBalance ? 'text-success-glow' : 'text-white' }}">
+                            <strong class="fs-4 {{ $hasBalance ? '' : 'text-white' }}">
                                 {{ number_format($wallet->available_balance, 4) }} {{ $wallet->coin_type }}
                             </strong>
                             @if($usdRate > 0)
