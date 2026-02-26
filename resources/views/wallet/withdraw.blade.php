@@ -496,16 +496,10 @@
                     <div class="info-item">
                         <i class="bi bi-lightning-charge text-white-50"></i>
                         <span class="text-white-50">Network Fee:</span>
-                        <strong class="text-white">0.001 {{ $wallet->coin_type }}</strong>
+                        <strong class="text-white">2 USD</strong>
                     </div>
                     
-                    @if($usdRate > 0)
-                    <div class="info-item">
-                        <i class="bi bi-currency-dollar text-white-50"></i>
-                        <span class="text-white-50">Fee (USD):</span>
-                        <strong class="text-white">$1.0</strong>
-                    </div>
-                    @endif
+                    
                     
                     <div class="info-item">
                         <i class="bi bi-clock text-white-50"></i>
