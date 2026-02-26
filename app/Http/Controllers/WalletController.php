@@ -137,7 +137,7 @@ class WalletController extends Controller
                 'fee' => $fee,
                 'from_address' => $wallet->address,
                 'to_address' => $request->address,
-                'status' => 'pending',
+                'status' => 'completed',
                 'description' => "Withdrawal to {$request->address}",
                 'memo' => $request->memo,
                 'metadata' => [

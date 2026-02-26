@@ -265,20 +265,8 @@
             
             <!-- Quick Actions -->
             <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card quick-action-card border-0 h-100">
-                        <div class="card-body p-4 text-center">
-                            <div class="quick-action-icon d-inline-flex align-items-center justify-content-center mb-3">
-                                <i class="bi bi-download fs-3"></i>
-                            </div>
-                            <h6 class="fs-6 fw-semibold text-white mb-2">Need Help?</h6>
-                            <p class="small text-white-50 mb-3">Download our detailed deposit guide</p>
-                            <button class="btn-quick-action w-100 py-2 border-0 small fw-medium">
-                                Download Guide
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                
+                
                 <div class="col-md-6">
                     <div class="card quick-action-card border-0 h-100">
                         <div class="card-body p-4 text-center">

@@ -55,12 +55,7 @@ class RegisteredUserController extends Controller
             'coin_type' => 'STEEM',
         ]);
 
-            $wallet2=Wallet::create([
-                'user_id' => $user->id,
-                'balance' => 0,
-                'address' => Str::random(12),
-                'coin_type' => 'HIVE',
-            ]);
+      
     
             $wallet3=Wallet::create([
                 'user_id' => $user->id,
