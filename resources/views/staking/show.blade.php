@@ -152,26 +152,6 @@
                             </div>
                             <div class="calculator-body p-4">
                                 <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <div class="reward-card p-4 text-center">
-                                            <small class="d-block text-white-50 small fw-medium mb-3">Daily Reward</small>
-                                            <div class="reward-value fs-2 fw-bold text-white mb-2 font-monospace" id="dailyReward">0</div>
-                                            <small class="d-block text-white-50 small">{{ $pool->coin_type }}/day</small>
-                                            @if($poolUsdRate > 0)
-                                            <small class="d-block text-white-50 small mt-1" id="dailyRewardUsd">$0.00</small>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="reward-card p-4 text-center">
-                                            <small class="d-block text-white-50 small fw-medium mb-3">Duration Reward</small>
-                                            <div class="reward-value fs-2 fw-bold text-white mb-2 font-monospace" id="durationReward">0</div>
-                                            <small class="d-block text-white-50 small">{{ $pool->coin_type }} total</small>
-                                            @if($poolUsdRate > 0)
-                                            <small class="d-block text-white-50 small mt-1" id="durationRewardUsd">$0.00</small>
-                                            @endif
-                                        </div>
-                                    </div>
                                     <div class="col-12">
                                         <div class="total-reward-card d-flex justify-content-between align-items-center p-4">
                                             <div>
@@ -182,8 +162,7 @@
                                                 @endif
                                             </div>
                                             <div class="apy-display text-end">
-                                                <small class="d-block text-white-50 small fw-medium mb-2">APY</small>
-                                                <div class="apy-value fs-2 fw-bold text-white">{{ number_format($pool->apy, 2) }}%</div>
+                                                <small class="d-block text-white-50 small fw-medium mb-2"></small>
                                             </div>
                                         </div>
                                     </div>
@@ -777,50 +756,27 @@ body {
     
     function calculateRewards() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
-        
-        const dailyRewardEl = document.getElementById('dailyReward');
-        const durationRewardEl = document.getElementById('durationReward');
         const totalRewardEl = document.getElementById('totalReward');
-        
-        const dailyRewardUsdEl = document.getElementById('dailyRewardUsd');
-        const durationRewardUsdEl = document.getElementById('durationRewardUsd');
         const totalRewardUsdEl = document.getElementById('totalRewardUsd');
         
         if (amount <= 0 || isNaN(amount)) {
-            dailyRewardEl.textContent = '0';
-            durationRewardEl.textContent = '0';
             totalRewardEl.textContent = '0 {{ $pool->coin_type }}';
             
             if (usdRate > 0) {
-                if (dailyRewardUsdEl) dailyRewardUsdEl.textContent = '$0.00';
-                if (durationRewardUsdEl) durationRewardUsdEl.textContent = '$0.00';
                 if (totalRewardUsdEl) totalRewardUsdEl.textContent = '$0.00';
             }
             return;
         }
         
-        // Daily reward rate
-        const dailyRate = (apy / 365) / 100;
-        const dailyReward = amount * dailyRate;
+        // Calculate total reward based on APY
+        const apyDecimal = apy / 100;
+        const durationInYears = durationMinutes / (60 * 24 * 365); // Convert minutes to years
+        const totalReward = amount * apyDecimal;
         
-        // Duration reward
-        const durationInDays = durationMinutes / 1440; // Convert minutes to days
-        const durationReward = amount * dailyRate * durationInDays;
-        
-        // Total reward
-        const totalReward = durationReward;
-        
-        dailyRewardEl.textContent = formatNumber(dailyReward);
-        durationRewardEl.textContent = formatNumber(durationReward);
         totalRewardEl.textContent = formatNumber(totalReward) + ' {{ $pool->coin_type }}';
         
         if (usdRate > 0) {
-            const dailyRewardUsd = dailyReward * usdRate;
-            const durationRewardUsd = durationReward * usdRate;
             const totalRewardUsd = totalReward * usdRate;
-            
-            if (dailyRewardUsdEl) dailyRewardUsdEl.textContent = `$${dailyRewardUsd.toFixed(2)}`;
-            if (durationRewardUsdEl) durationRewardUsdEl.textContent = `$${durationRewardUsd.toFixed(2)}`;
             if (totalRewardUsdEl) totalRewardUsdEl.textContent = `$${totalRewardUsd.toFixed(2)}`;
         }
     }
