@@ -32,14 +32,19 @@
                             ));
                         }
                         $availableUsd = $wallet->available_balance * $usdRate;
+                        $hasBalance = $wallet->available_balance > 0;
                     @endphp
                     
-                    <div class="wallet-info-badge">
+                    <div class="wallet-info-badge {{ $hasBalance ? 'has-balance' : '' }}">
                         <div class="balance-display">
                             <small class="text-white-75">Available Balance</small>
-                            <strong class="fs-4 text-white">{{ number_format($wallet->available_balance, 4) }} {{ $wallet->coin_type }}</strong>
+                            <strong class="fs-4 {{ $hasBalance ? 'text-success-glow' : 'text-white' }}">
+                                {{ number_format($wallet->available_balance, 4) }} {{ $wallet->coin_type }}
+                            </strong>
                             @if($usdRate > 0)
-                            <small class="d-block mt-1 text-white-50">≈ ${{ number_format($availableUsd, 2) }} USD</small>
+                            <small class="d-block mt-1 {{ $hasBalance ? 'text-success-light' : 'text-white-50' }}">
+                                ≈ ${{ number_format($availableUsd, 2) }} USD
+                            </small>
                             @endif
                         </div>
                     </div>
@@ -132,9 +137,13 @@
                                         <div class="balance-info">
                                             <i class="bi bi-wallet2 text-white-50"></i>
                                             <span class="text-white-50">Available:</span>
-                                            <strong class="text-white">{{ number_format($wallet->available_balance, 4) }}</strong>
+                                            <strong class="{{ $hasBalance ? 'text-success' : 'text-white' }}">
+                                                {{ number_format($wallet->available_balance, 4) }}
+                                            </strong>
                                             @if($usdRate > 0)
-                                            <small class="text-white-50 d-none d-sm-inline">(${{ number_format($availableUsd, 2) }})</small>
+                                            <small class="{{ $hasBalance ? 'text-success-light' : 'text-white-50' }} d-none d-sm-inline">
+                                                (${{ number_format($availableUsd, 2) }})
+                                            </small>
                                             @endif
                                         </div>
                                     </div>
@@ -536,6 +545,10 @@
     --text-tertiary: rgba(255, 255, 255, 0.7);
     --text-muted: rgba(255, 255, 255, 0.6);
     --text-dim: rgba(255, 255, 255, 0.45);
+    
+    /* Success Colors */
+    --success-light: #a7f3d0;
+    --success-glow: #34d399;
 }
 
 /* Base Text Colors */
@@ -551,6 +564,14 @@ body {
 .text-white-70 { color: rgba(255, 255, 255, 0.7) !important; }
 .text-white-50 { color: rgba(255, 255, 255, 0.6) !important; }
 .text-white-25 { color: rgba(255, 255, 255, 0.4) !important; }
+
+/* Success Text Colors */
+.text-success { color: #10b981 !important; }
+.text-success-light { color: var(--success-light) !important; }
+.text-success-glow { 
+    color: var(--success-glow) !important;
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
 
 /* Header Styles */
 .welcome-header {
@@ -601,6 +622,12 @@ body {
     padding: 1rem 1.5rem;
     color: white;
     box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+    transition: all 0.3s ease;
+}
+
+.wallet-info-badge.has-balance {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
 }
 
 .balance-display small {
