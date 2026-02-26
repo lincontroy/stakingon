@@ -266,7 +266,7 @@
             <!-- Quick Actions -->
             <div class="row g-4">
                 
-                
+
                 <div class="col-md-6">
                     <div class="card quick-action-card border-0 h-100">
                         <div class="card-body p-4 text-center">
@@ -417,7 +417,7 @@
                         <div class="d-flex align-items-center gap-3">
                             <i class="bi bi-infinity d-flex align-items-center justify-content-center flex-shrink-0"></i>
                             <span class="flex-grow-1 small text-white-50">Minimum:</span>
-                            <strong class="small text-white">No minimum</strong>
+                            <strong class="small text-white">$51</strong>
                         </div>
                         <div class="d-flex align-items-center gap-3">
                             <i class="bi bi-lightning d-flex align-items-center justify-content-center flex-shrink-0"></i>

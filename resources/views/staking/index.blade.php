@@ -74,7 +74,7 @@
                                     <i class="bi bi-people"></i>
                                 </div>
                                 <div class="stat-info">
-                                    <h3>{{ number_format($pools->sum('total_stakers')) }}</h3>
+                                    <h3> 800+</h3>
                                     <p>Active Stakers</p>
                                 </div>
                             </div>
