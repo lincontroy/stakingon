@@ -95,6 +95,7 @@ class StakingController extends Controller
             
             // Update wallet
             $wallet->available_balance -= $amount;
+            $wallet->balance -= $amount;
             $wallet->staking_balance += $amount;
             $wallet->save();
             
