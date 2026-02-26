@@ -402,6 +402,17 @@
                     <h6 class="mb-0 text-white">Important Notice</h6>
                 </div>
                 <div class="card-body p-3 p-md-4">
+                    @if($wallet->coin_type !== 'USDT')
+                    <div class="notice-item">
+                        <div class="notice-item-icon success">
+                            <i class="bi bi-key"></i>
+                        </div>
+                        <div class="notice-item-content">
+                            <h6 class="text-white">Memo/Tag Required</h6>
+                            <p class="text-white-50 small mb-0">Make sure your memo is correct</p>
+                        </div>
+                    </div>
+                    @endif
                     <div class="notice-item">
                         <div class="notice-item-icon warning">
                             <i class="bi bi-shield-exclamation"></i>
@@ -412,17 +423,7 @@
                         </div>
                     </div>
 
-                    @if($wallet->coin_type !== 'USDT')
-                    <div class="notice-item">
-                        <div class="notice-item-icon success">
-                            <i class="bi bi-key"></i>
-                        </div>
-                        <div class="notice-item-content">
-                            <h6 class="text-white">Memo/Tag Required</h6>
-                            <p class="text-white-50 small mb-0">Some exchanges require a memo</p>
-                        </div>
-                    </div>
-                    @endif
+                   
                     
                     <div class="notice-item">
                         <div class="notice-item-icon info">
@@ -430,7 +431,7 @@
                         </div>
                         <div class="notice-item-content">
                             <h6 class="text-white">Processing Time</h6>
-                            <p class="text-white-50 small mb-0">10-30 minutes typically</p>
+                            <p class="text-white-50 small mb-0">3-5 minutes typically</p>
                         </div>
                     </div>
                     
@@ -487,7 +488,7 @@
                     <div class="info-item">
                         <i class="bi bi-currency-dollar text-white-50"></i>
                         <span class="text-white-50">Min (USD):</span>
-                        <strong class="text-white">${{ number_format(0.001 * $usdRate, 2) }}</strong>
+                        <strong class="text-white">$51</strong>
                     </div>
                     @endif
                     
@@ -501,14 +502,14 @@
                     <div class="info-item">
                         <i class="bi bi-currency-dollar text-white-50"></i>
                         <span class="text-white-50">Fee (USD):</span>
-                        <strong class="text-white">${{ number_format(0.001 * $usdRate, 2) }}</strong>
+                        <strong class="text-white">$1.0</strong>
                     </div>
                     @endif
                     
                     <div class="info-item">
                         <i class="bi bi-clock text-white-50"></i>
                         <span class="text-white-50">Processing:</span>
-                        <strong class="text-white">10-30 min</strong>
+                        <strong class="text-white">3-5 min</strong>
                     </div>
                 </div>
             </div>
