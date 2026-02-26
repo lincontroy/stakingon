@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use App\Models\Wallet;
 
 class RegisteredUserController extends Controller
 {
@@ -44,6 +45,31 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+
+        $wallet1=Wallet::create([
+            'user_id' => $user->id,
+            'balance' => 0,
+            'address' => 'stakingonsteem',
+            'coin_type' => 'STEEM',
+        ]);
+
+            $wallet2=Wallet::create([
+                'user_id' => $user->id,
+                'balance' => 0,
+                'address' => 'stakingonhive',
+                'coin_type' => 'HIVE',
+            ]);
+    
+            $wallet3=Wallet::create([
+                'user_id' => $user->id,
+                'balance' => 0,
+                'address' => 'stakingonusdt',
+                'coin_type' => 'USDT',
+            ]);
+
+
+
 
         event(new Registered($user));
 

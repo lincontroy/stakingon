@@ -8,16 +8,16 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4">
         <div>
             <div class="d-flex align-items-center gap-3 mb-3">
-                
+                <div class="user-avatar">
                     @php
                         $userName = Auth::user()->name;
                         if (is_array($userName)) {
                             $userName = $userName['name'] ?? $userName[0] ?? 'U';
                         }
                         $firstLetter = strtoupper(substr((string)$userName, 0, 1));
+                        echo $firstLetter;
                     @endphp
-                  
-              
+                </div>
                 <div>
                     <h1 class="display-6 fw-bold mb-2 text-gradient">
                         Welcome back, {{ $userName }}! 👋
@@ -48,6 +48,33 @@
 <!-- Stats Overview -->
 <div class="stats-grid mb-5">
     <div class="row g-4">
+        @php
+            $usdRates = [
+                'STEEM' => (float) (env('STEEMUSD') ?? 0.051),
+                'HIVE' => (float) (env('HIVEUSD') ?? 0.0674),
+                'USDT' => (float) (env('USDTUSD') ?? 1),
+            ];
+            
+            $totalUsdValue = 0;
+            $totalStakingUsd = 0;
+            $totalEarnedUsd = 0;
+            
+            foreach($wallets as $wallet) {
+                if(isset($usdRates[$wallet->coin_type])) {
+                    $rate = $usdRates[$wallet->coin_type];
+                    $totalUsdValue += $wallet->balance * $rate;
+                    $totalStakingUsd += $wallet->staking_balance * $rate;
+                }
+            }
+            
+            // Calculate earned USD from transactions
+            foreach($recentTransactions as $transaction) {
+                if($transaction->type == 'staking_reward' && isset($usdRates[$transaction->coin_type])) {
+                    $totalEarnedUsd += $transaction->amount * $usdRates[$transaction->coin_type];
+                }
+            }
+        @endphp
+        
         <div class="col-xl-3 col-md-6">
             <div class="stat-card stat-primary">
                 <div class="stat-decoration"></div>
@@ -61,10 +88,16 @@
                         </div>
                     </div>
                     <h3 class="stat-title">Total Balance</h3>
-                    <h2 class="stat-value">{{ number_format($stats['total_balance'], 8) }}</h2>
+                    <h2 class="stat-value">{{ number_format($stats['total_balance'], 4) }}</h2>
+                    @if($totalUsdValue > 0)
+                    <div class="stat-usd">
+                        <span class="badge bg-success bg-opacity-25 text-success px-2 py-1 rounded-pill">
+                            <i class="bi bi-currency-dollar me-1"></i>${{ number_format($totalUsdValue, 2) }} USD
+                        </span>
+                    </div>
+                    @endif
                     <p class="stat-description">Across all wallets</p>
                 </div>
-               
             </div>
         </div>
         
@@ -81,10 +114,16 @@
                         </div>
                     </div>
                     <h3 class="stat-title">Currently Staking</h3>
-                    <h2 class="stat-value">{{ number_format($stats['total_staking'], 8) }}</h2>
+                    <h2 class="stat-value">{{ number_format($stats['total_staking'], 4) }}</h2>
+                    @if($totalStakingUsd > 0)
+                    <div class="stat-usd">
+                        <span class="badge bg-warning bg-opacity-25 text-warning px-2 py-1 rounded-pill">
+                            <i class="bi bi-currency-dollar me-1"></i>${{ number_format($totalStakingUsd, 2) }} USD
+                        </span>
+                    </div>
+                    @endif
                     <p class="stat-description">Active stakes</p>
                 </div>
-               
             </div>
         </div>
         
@@ -101,10 +140,16 @@
                         </div>
                     </div>
                     <h3 class="stat-title">Total Earned</h3>
-                    <h2 class="stat-value">{{ number_format($stats['total_earned'], 8) }}</h2>
+                    <h2 class="stat-value">{{ number_format($stats['total_earned'], 4) }}</h2>
+                    @if($totalEarnedUsd > 0)
+                    <div class="stat-usd">
+                        <span class="badge bg-success bg-opacity-25 text-success px-2 py-1 rounded-pill">
+                            <i class="bi bi-currency-dollar me-1"></i>${{ number_format($totalEarnedUsd, 2) }} USD
+                        </span>
+                    </div>
+                    @endif
                     <p class="stat-description">All-time rewards</p>
                 </div>
-               
             </div>
         </div>
         
@@ -124,7 +169,6 @@
                     <h2 class="stat-value">{{ $stats['active_stakes'] }}</h2>
                     <p class="stat-description">Running now</p>
                 </div>
-               
             </div>
         </div>
     </div>
@@ -164,6 +208,12 @@
                     @if($activeStakes->count() > 0)
                         <div class="stakes-container">
                             @foreach($activeStakes as $stake)
+                            @php
+                                $stakeUsdValue = 0;
+                                if(isset($usdRates[$stake->stakingPool->coin_type])) {
+                                    $stakeUsdValue = $stake->amount * $usdRates[$stake->stakingPool->coin_type];
+                                }
+                            @endphp
                             <div class="stake-card">
                                 <div class="stake-header">
                                     <div class="stake-asset">
@@ -184,6 +234,9 @@
                                         <div class="detail-item">
                                             <label>Staked Amount</label>
                                             <span class="value">{{ number_format($stake->amount, 4) }}</span>
+                                            @if($stakeUsdValue > 0)
+                                            <small class="text-white-50 d-block">≈ ${{ number_format($stakeUsdValue, 2) }}</small>
+                                            @endif
                                         </div>
                                         <div class="detail-item">
                                             <label>Progress</label>
@@ -262,6 +315,12 @@
                     @if($recentTransactions->count() > 0)
                         <div class="activity-feed">
                             @foreach($recentTransactions as $transaction)
+                            @php
+                                $txUsdValue = 0;
+                                if(isset($usdRates[$transaction->coin_type])) {
+                                    $txUsdValue = $transaction->amount * $usdRates[$transaction->coin_type];
+                                }
+                            @endphp
                             <div class="activity-item">
                                 <div class="activity-indicator {{ $transaction->type }}"></div>
                                 <div class="activity-content">
@@ -274,6 +333,11 @@
                                             {{ $transaction->type == 'deposit' ? '+' : '-' }}{{ number_format($transaction->amount, 4) }}
                                         </div>
                                     </div>
+                                    @if($txUsdValue > 0)
+                                    <div class="activity-usd small mb-1">
+                                        <span class="text-white-50">≈ ${{ number_format($txUsdValue, 2) }}</span>
+                                    </div>
+                                    @endif
                                     <div class="activity-footer">
                                         <span class="activity-time">
                                             <i class="bi bi-clock me-1"></i>{{ $transaction->created_at->diffForHumans() }}
@@ -321,10 +385,19 @@
             @if($wallets->count() > 0)
                 <div class="wallets-grid">
                     @foreach($wallets as $wallet)
+                    @php
+                        $walletUsdRate = 0;
+                        if(isset($usdRates[$wallet->coin_type])) {
+                            $walletUsdRate = $usdRates[$wallet->coin_type];
+                        }
+                        $walletUsdValue = $wallet->balance * $walletUsdRate;
+                        $availableUsd = $wallet->available_balance * $walletUsdRate;
+                        $stakedUsd = $wallet->staking_balance * $walletUsdRate;
+                    @endphp
                     <div class="wallet-card">
                         <div class="wallet-header">
-                            <div class="wallet-icon" style="background: linear-gradient(135deg, {{ $wallet->gradient_start ?? '#667eea' }} 0%, {{ $wallet->gradient_end ?? '#764ba2' }} 100%);">
-                                <i class="bi {{ $wallet->coinIcon }}"></i>
+                            <div class="wallet-icon" style="background: linear-gradient(135deg, {{ $wallet->gradient_start ?? ($wallet->coin_type == 'USDT' ? '#22c55e' : '#667eea') }} 0%, {{ $wallet->gradient_end ?? ($wallet->coin_type == 'USDT' ? '#10b981' : '#764ba2') }} 100%);">
+                                <i class="bi {{ $wallet->coinIcon ?? ($wallet->coin_type == 'USDT' ? 'bi-currency-dollar' : 'bi-coin') }}"></i>
                             </div>
                             <div class="wallet-actions">
                                 <button class="btn btn-icon" title="Send">
@@ -341,19 +414,33 @@
                         <div class="wallet-info">
                             <h5 class="wallet-name">{{ $wallet->coin_type }}</h5>
                             <h2 class="wallet-balance">{{ number_format($wallet->balance, 4) }}</h2>
+                            @if($walletUsdRate > 0)
+                            <p class="wallet-usd-value small text-white-50 mb-1">≈ ${{ number_format($walletUsdValue, 2) }}</p>
+                            @endif
                             <p class="wallet-address">{{ substr($wallet->address, 0, 8) }}...{{ substr($wallet->address, -6) }}</p>
                         </div>
                         <div class="wallet-stats">
                             <div class="stat">
                                 <label>Available</label>
                                 <span class="value">{{ number_format($wallet->available_balance, 4) }}</span>
+                                @if($walletUsdRate > 0)
+                                <small class="text-white-50 d-block">${{ number_format($availableUsd, 2) }}</small>
+                                @endif
                             </div>
                             <div class="stat-divider"></div>
                             <div class="stat">
                                 <label>Staked</label>
                                 <span class="value staked">{{ number_format($wallet->staking_balance, 4) }}</span>
+                                @if($walletUsdRate > 0)
+                                <small class="text-white-50 d-block">${{ number_format($stakedUsd, 2) }}</small>
+                                @endif
                             </div>
                         </div>
+                        @if($walletUsdRate > 0)
+                        <div class="wallet-rate mt-2 small text-center text-white-50">
+                            <i class="bi bi-currency-exchange me-1"></i>1 {{ $wallet->coin_type }} = ${{ number_format($walletUsdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }}
+                        </div>
+                        @endif
                     </div>
                     @endforeach
                 </div>
@@ -387,6 +474,7 @@
     --dark: #1a1a2e;
     --light: #f8f9fa;
     --gray: #6c757d;
+    --gray-light: #94a3b8;
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -560,7 +648,7 @@
 
 .stat-title {
     font-size: 0.875rem;
-    color: var(--gray);
+    color: var(--gray-light);
     margin-bottom: 0.5rem;
     font-weight: 500;
     text-transform: uppercase;
@@ -575,44 +663,18 @@
     line-height: 1.2;
 }
 
+.stat-usd {
+    margin-bottom: 0.5rem;
+}
+
 .stat-description {
     font-size: 0.813rem;
-    color: var(--gray);
+    color: var(--gray-light);
     margin: 0;
 }
 
 .stat-footer {
     margin-top: 1rem;
-}
-
-.sparkline {
-    height: 40px;
-    background: linear-gradient(90deg, 
-        rgba(255, 255, 255, 0.05) 0%, 
-        rgba(255, 255, 255, 0.1) 50%, 
-        rgba(255, 255, 255, 0.05) 100%);
-    border-radius: 8px;
-    position: relative;
-    overflow: hidden;
-}
-
-.sparkline::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.3) 50%, 
-        transparent 100%);
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
 }
 
 /* Dashboard Panels */
@@ -649,7 +711,7 @@
 
 .panel-subtitle {
     font-size: 0.813rem;
-    color: var(--gray);
+    color: var(--gray-light);
     margin-left: 2rem;
 }
 
@@ -665,7 +727,7 @@
     border-radius: 8px;
     border: 1px solid var(--glass-border);
     background: transparent;
-    color: var(--gray);
+    color: var(--gray-light);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -741,7 +803,7 @@
 
 .asset-info span {
     font-size: 0.813rem;
-    color: var(--gray);
+    color: var(--gray-light);
 }
 
 .apy-badge {
@@ -771,7 +833,7 @@
 
 .detail-item label {
     font-size: 0.75rem;
-    color: var(--gray);
+    color: var(--gray-light);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -816,7 +878,7 @@
     top: -20px;
     right: 0;
     font-size: 0.75rem;
-    color: var(--gray);
+    color: var(--gray-light);
 }
 
 .stake-footer {
@@ -909,7 +971,7 @@
 
 .coin-badge {
     background: rgba(255, 255, 255, 0.1);
-    color: var(--gray);
+    color: var(--gray-light);
     padding: 0.125rem 0.5rem;
     border-radius: 12px;
     font-size: 0.75rem;
@@ -928,6 +990,10 @@
     color: var(--warning);
 }
 
+.activity-usd {
+    margin-bottom: 0.5rem;
+}
+
 .activity-footer {
     display: flex;
     justify-content: space-between;
@@ -936,7 +1002,7 @@
 
 .activity-time {
     font-size: 0.75rem;
-    color: var(--gray);
+    color: var(--gray-light);
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -1012,7 +1078,7 @@
     border-radius: 8px;
     border: 1px solid var(--glass-border);
     background: transparent;
-    color: var(--gray);
+    color: var(--gray-light);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1031,7 +1097,7 @@
 
 .wallet-name {
     font-size: 0.875rem;
-    color: var(--gray);
+    color: var(--gray-light);
     margin-bottom: 0.5rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -1044,9 +1110,14 @@
     margin-bottom: 0.5rem;
 }
 
+.wallet-usd-value {
+    font-size: 0.875rem;
+    color: var(--gray-light);
+}
+
 .wallet-address {
     font-size: 0.75rem;
-    color: var(--gray);
+    color: var(--gray-light);
     font-family: 'Courier New', monospace;
     margin: 0;
 }
@@ -1065,7 +1136,7 @@
 .stat label {
     display: block;
     font-size: 0.75rem;
-    color: var(--gray);
+    color: var(--gray-light);
     margin-bottom: 0.25rem;
 }
 
@@ -1082,6 +1153,13 @@
 .stat-divider {
     width: 1px;
     background: var(--glass-border);
+}
+
+.wallet-rate {
+    font-size: 0.75rem;
+    color: var(--gray-light);
+    border-top: 1px dashed var(--glass-border);
+    padding-top: 0.5rem;
 }
 
 /* Empty States */
@@ -1104,7 +1182,7 @@
     align-items: center;
     justify-content: center;
     font-size: 2rem;
-    color: var(--gray);
+    color: var(--gray-light);
     margin-bottom: 1.5rem;
 }
 
@@ -1123,7 +1201,7 @@
 }
 
 .empty-content p {
-    color: var(--gray);
+    color: var(--gray-light);
     margin-bottom: 1.5rem;
 }
 
@@ -1249,16 +1327,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Simulate sparkline animations
-    const sparklines = document.querySelectorAll('.sparkline');
-    sparklines.forEach(sparkline => {
-        setInterval(() => {
-            sparkline.style.opacity = '0.5';
-            setTimeout(() => {
-                sparkline.style.opacity = '1';
-            }, 300);
-        }, 3000);
-    });
+    // Format numbers with commas
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 });
 </script>
 @endsection

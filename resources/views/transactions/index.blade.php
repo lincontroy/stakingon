@@ -23,6 +23,28 @@
                     </div>
                     
                     <!-- Stats Grid -->
+                    @php
+                        $usdRates = [
+                            'STEEM' => (float) (env('STEEMUSD') ?? 0.051),
+                            'HIVE' => (float) (env('HIVEUSD') ?? 0.0674),
+                            'USDT' => (float) (env('USDTUSD') ?? 1),
+                        ];
+                        
+                        $totalDepositUsd = 0;
+                        $totalWithdrawalUsd = 0;
+                        
+                        foreach($transactions as $transaction) {
+                            if(isset($usdRates[$transaction->coin_type])) {
+                                $rate = $usdRates[$transaction->coin_type];
+                                if($transaction->type == 'deposit' || $transaction->type == 'reward') {
+                                    $totalDepositUsd += $transaction->amount * $rate;
+                                } else if($transaction->type == 'withdrawal') {
+                                    $totalWithdrawalUsd += $transaction->amount * $rate;
+                                }
+                            }
+                        }
+                    @endphp
+                    
                     <div class="stats-grid">
                         <div class="stat-card-modern">
                             <div class="stat-icon-wrapper primary">
@@ -31,6 +53,9 @@
                             <div class="stat-details">
                                 <h3>{{ $transactions->total() }}</h3>
                                 <p>Total Transactions</p>
+                                @if($totalDepositUsd + $totalWithdrawalUsd > 0)
+                                <small class="text-white-50">${{ number_format($totalDepositUsd + $totalWithdrawalUsd, 2) }} volume</small>
+                                @endif
                             </div>
                         </div>
                         
@@ -41,6 +66,9 @@
                             <div class="stat-details">
                                 <h3>{{ $transactions->where('type', 'deposit')->count() }}</h3>
                                 <p>Deposits</p>
+                                @if($totalDepositUsd > 0)
+                                <small class="text-success">${{ number_format($totalDepositUsd, 2) }}</small>
+                                @endif
                             </div>
                         </div>
                         
@@ -51,6 +79,9 @@
                             <div class="stat-details">
                                 <h3>{{ $transactions->where('type', 'withdrawal')->count() }}</h3>
                                 <p>Withdrawals</p>
+                                @if($totalWithdrawalUsd > 0)
+                                <small class="text-warning">${{ number_format($totalWithdrawalUsd, 2) }}</small>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -131,6 +162,7 @@
                                             <option value="">All Coins</option>
                                             <option value="HIVE" {{ request('coin_type') == 'HIVE' ? 'selected' : '' }}>HIVE</option>
                                             <option value="STEEM" {{ request('coin_type') == 'STEEM' ? 'selected' : '' }}>STEEM</option>
+                                            <option value="USDT" {{ request('coin_type') == 'USDT' ? 'selected' : '' }}>USDT</option>
                                             <option value="BTC" {{ request('coin_type') == 'BTC' ? 'selected' : '' }}>BTC</option>
                                             <option value="ETH" {{ request('coin_type') == 'ETH' ? 'selected' : '' }}>ETH</option>
                                             <option value="BNB" {{ request('coin_type') == 'BNB' ? 'selected' : '' }}>BNB</option>
@@ -220,6 +252,9 @@
                         </h5>
                         <p class="text-muted small mb-0">
                             Showing {{ $transactions->firstItem() ?? 0 }}-{{ $transactions->lastItem() ?? 0 }} of {{ $transactions->total() }} results
+                            @if($totalDepositUsd + $totalWithdrawalUsd > 0)
+                            | Total volume: <span class="text-white-50">${{ number_format($totalDepositUsd + $totalWithdrawalUsd, 2) }}</span>
+                            @endif
                         </p>
                     </div>
                     
@@ -267,6 +302,12 @@
                                             </th>
                                             <th>
                                                 <div class="th-content">
+                                                    <i class="bi bi-currency-dollar"></i>
+                                                    <span>USD Value</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
                                                     <i class="bi bi-receipt"></i>
                                                     <span>Fee</span>
                                                 </div>
@@ -298,6 +339,11 @@
                                     </thead>
                                     <tbody>
                                         @foreach($transactions as $transaction)
+                                        @php
+                                            $txUsdRate = $usdRates[$transaction->coin_type] ?? 0;
+                                            $txUsdValue = $transaction->amount * $txUsdRate;
+                                            $feeUsdValue = $transaction->fee * $txUsdRate;
+                                        @endphp
                                         <tr class="transaction-row-premium">
                                             <td>
                                                 <div class="date-cell">
@@ -348,10 +394,27 @@
                                                 </div>
                                             </td>
                                             <td>
+                                                <div class="usd-cell">
+                                                    @if($txUsdRate > 0)
+                                                    <div class="usd-value {{ in_array($transaction->type, ['deposit', 'reward']) ? 'positive' : 'negative' }}">
+                                                        ${{ number_format($txUsdValue, 2) }}
+                                                    </div>
+                                                    <div class="usd-rate small text-white-50">
+                                                        @ {{ number_format($txUsdRate, $transaction->coin_type == 'USDT' ? 2 : 4) }}
+                                                    </div>
+                                                    @else
+                                                    <span class="text-muted-premium">—</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td>
                                                 @if($transaction->fee > 0)
                                                 <div class="fee-cell">
                                                     <div class="fee-amount">{{ number_format($transaction->fee, 8) }}</div>
                                                     <div class="fee-label">Network Fee</div>
+                                                    @if($feeUsdValue > 0)
+                                                    <div class="fee-usd small text-white-50">${{ number_format($feeUsdValue, 2) }}</div>
+                                                    @endif
                                                 </div>
                                                 @else
                                                 <span class="text-muted-premium">—</span>
@@ -405,6 +468,10 @@
                         <div id="grid-view" class="view-container">
                             <div class="transactions-grid">
                                 @foreach($transactions as $transaction)
+                                @php
+                                    $txUsdRate = $usdRates[$transaction->coin_type] ?? 0;
+                                    $txUsdValue = $transaction->amount * $txUsdRate;
+                                @endphp
                                 <div class="transaction-card-grid">
                                     <div class="transaction-card-header-grid">
                                         <div class="type-badge-grid {{ $transaction->type }}">
@@ -436,6 +503,14 @@
                                         <span>{{ number_format($transaction->amount, 8) }} {{ $transaction->coin_type }}</span>
                                     </div>
                                     
+                                    @if($txUsdRate > 0)
+                                    <div class="transaction-usd-grid mb-3 text-center">
+                                        <span class="badge bg-primary bg-opacity-25 text-white px-3 py-2">
+                                            ≈ ${{ number_format($txUsdValue, 2) }} USD
+                                        </span>
+                                    </div>
+                                    @endif
+                                    
                                     <div class="transaction-details-grid">
                                         <div class="detail-item-grid">
                                             <span class="detail-label-grid">Date</span>
@@ -445,6 +520,12 @@
                                             <span class="detail-label-grid">Fee</span>
                                             <span class="detail-value-grid">{{ $transaction->fee > 0 ? number_format($transaction->fee, 8) : '—' }}</span>
                                         </div>
+                                        @if($txUsdRate > 0)
+                                        <div class="detail-item-grid">
+                                            <span class="detail-label-grid">Rate</span>
+                                            <span class="detail-value-grid">${{ number_format($txUsdRate, $transaction->coin_type == 'USDT' ? 2 : 4) }}</span>
+                                        </div>
+                                        @endif
                                         <div class="detail-item-grid">
                                             <span class="detail-label-grid">TX ID</span>
                                             <span class="detail-value-grid">{{ substr($transaction->txid, 0, 12) }}...</span>
@@ -654,6 +735,12 @@
     font-size: 0.875rem;
     color: var(--color-text-secondary);
     margin: 0;
+}
+
+.stat-details small {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
 }
 
 .header-decoration {
@@ -1125,6 +1212,28 @@
     color: var(--color-text-tertiary);
 }
 
+.usd-cell {
+    min-width: 100px;
+}
+
+.usd-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.usd-value.positive {
+    color: var(--color-success);
+}
+
+.usd-value.negative {
+    color: var(--color-danger);
+}
+
+.usd-rate {
+    font-size: 0.7rem;
+}
+
 .fee-cell {
     min-width: 100px;
 }
@@ -1139,6 +1248,11 @@
 .fee-label {
     font-size: 0.75rem;
     color: var(--color-text-tertiary);
+}
+
+.fee-usd {
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
 }
 
 .address-cell {
@@ -1361,6 +1475,16 @@
 
 .transaction-amount-grid.negative {
     color: var(--color-text-primary);
+}
+
+.transaction-usd-grid {
+    margin-bottom: 1rem;
+}
+
+.transaction-usd-grid .badge {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    font-weight: 500;
 }
 
 .transaction-details-grid {
@@ -1688,6 +1812,14 @@ function copyTxid(txid) {
     }).catch(err => {
         console.error('Failed to copy:', err);
     });
+}
+
+// Format number as currency
+function formatCurrency(value) {
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
 }
 
 // Auto-open filters if any filter is active

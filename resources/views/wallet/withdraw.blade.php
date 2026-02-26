@@ -21,10 +21,23 @@
                         </p>
                     </div>
                 </div>
+                @php
+                    $usdRate = 0;
+                    if(in_array($wallet->coin_type, ['STEEM', 'HIVE', 'USDT'])) {
+                        $usdRate = (float) (env($wallet->coin_type.'USD', 
+                            $wallet->coin_type == 'STEEM' ? 0.051 : 
+                            ($wallet->coin_type == 'HIVE' ? 0.0674 : 1)
+                        ));
+                    }
+                    $availableUsd = $wallet->available_balance * $usdRate;
+                @endphp
                 <div class="wallet-info-badge">
                     <div class="balance-display">
                         <small>Available Balance</small>
-                        <strong>{{ number_format($wallet->available_balance, 3) }} {{ $wallet->coin_type }}</strong>
+                        <strong>{{ number_format($wallet->available_balance, 4) }} {{ $wallet->coin_type }}</strong>
+                        @if($usdRate > 0)
+                        <small class="d-block mt-1" style="font-size: 0.75rem; opacity: 0.9;">≈ ${{ number_format($availableUsd, 2) }} USD</small>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -48,6 +61,19 @@
             </div>
             <div class="card-body">
                 
+                <!-- Exchange Rate Info -->
+                @if($usdRate > 0)
+                <div class="exchange-rate-info mb-4 p-3" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 14px;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-currency-exchange text-success"></i>
+                            <span class="small text-white-50">Current Exchange Rate:</span>
+                        </div>
+                        <strong class="text-white">1 {{ $wallet->coin_type }} = ${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }} USD</strong>
+                    </div>
+                </div>
+                @endif
+
                 <!-- Withdrawal Form -->
                 <form action="{{ route('wallet.withdraw', $wallet->coin_type) }}" method="POST" id="withdrawForm">
                     @csrf
@@ -77,9 +103,15 @@
                                            max="{{ $wallet->available_balance }}"
                                            placeholder="0.000"
                                            required
-                                           autofocus>
+                                           autofocus
+                                           oninput="updateUsdValue()">
                                     <span class="input-suffix">{{ $wallet->coin_type }}</span>
                                 </div>
+                                @if($usdRate > 0)
+                                <div class="mt-2 text-end" id="usdAmountDisplay">
+                                    <small class="text-white-50">≈ $0.00 USD</small>
+                                </div>
+                                @endif
                                 <div class="amount-controls">
                                     <div class="quick-amounts">
                                         <small>Quick select:</small>
@@ -93,7 +125,10 @@
                                     <div class="balance-info">
                                         <i class="bi bi-wallet2 me-1"></i>
                                         <span>Available:</span>
-                                        <strong>{{ number_format($wallet->available_balance, 3) }} {{ $wallet->coin_type }}</strong>
+                                        <strong>{{ number_format($wallet->available_balance, 4) }} {{ $wallet->coin_type }}</strong>
+                                        @if($usdRate > 0)
+                                        <small class="text-white-50 ms-2">(${{ number_format($availableUsd, 2) }})</small>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -135,7 +170,7 @@
                                 @if($wallet->coin_type !== 'USDT')
                                 <div class="memo-section">
                                     <label for="memo" class="form-label">
-                                        <i class="bi bi-key me-2"></i>Memo (Optional)
+                                        <i class="bi bi-key me-2"></i>Memo 
                                     </label>
                                     <div class="input-with-icon">
                                         <i class="bi bi-chat-text input-icon"></i>
@@ -143,7 +178,7 @@
                                                class="form-control-modern" 
                                                id="memo" 
                                                name="memo"
-                                               placeholder="Enter memo/tag (if required by recipient)"
+                                               placeholder="Enter memo/tag "
                                                maxlength="255">
                                     </div>
                                     <small class="text-muted memo-hint">
@@ -197,6 +232,18 @@
                                         </div>
                                     </div>
                                     
+                                    @if($usdRate > 0)
+                                    <div class="summary-item">
+                                        <div class="summary-label">
+                                            <i class="bi bi-currency-dollar"></i>
+                                            <span>USD Value</span>
+                                        </div>
+                                        <div class="summary-value text-success" id="reviewUsdAmount">
+                                            $0.00
+                                        </div>
+                                    </div>
+                                    @endif
+                                    
                                     <div class="summary-item">
                                         <div class="summary-label">
                                             <i class="bi bi-lightning-charge"></i>
@@ -206,6 +253,18 @@
                                             0.001 {{ $wallet->coin_type }}
                                         </div>
                                     </div>
+                                    
+                                    @if($usdRate > 0)
+                                    <div class="summary-item">
+                                        <div class="summary-label">
+                                            <i class="bi bi-currency-dollar"></i>
+                                            <span>Fee (USD)</span>
+                                        </div>
+                                        <div class="summary-value text-warning" id="reviewFeeUsd">
+                                            $0.00
+                                        </div>
+                                    </div>
+                                    @endif
                                     
                                     <div class="summary-divider"></div>
                                     
@@ -218,6 +277,18 @@
                                             0.001 {{ $wallet->coin_type }}
                                         </div>
                                     </div>
+                                    
+                                    @if($usdRate > 0)
+                                    <div class="summary-item">
+                                        <div class="summary-label">
+                                            <i class="bi bi-currency-dollar"></i>
+                                            <span>Total (USD)</span>
+                                        </div>
+                                        <div class="summary-value text-danger" id="reviewTotalUsd">
+                                            $0.00
+                                        </div>
+                                    </div>
+                                    @endif
                                     
                                     <div class="summary-item">
                                         <div class="summary-label">
@@ -318,13 +389,21 @@
                 @if($recentWithdrawals->count() > 0)
                     <div class="activity-list">
                         @foreach($recentWithdrawals as $tx)
+                        @php
+                            $txUsdValue = $tx->amount * $usdRate;
+                        @endphp
                         <div class="activity-item">
                             <div class="activity-item-icon">
                                 <i class="bi bi-arrow-up-circle text-primary"></i>
                             </div>
                             <div class="activity-item-content">
-                                <div class="d-flex justify-content-between">
-                                    <strong>{{ number_format($tx->amount, 3) }} {{ $tx->coin_type }}</strong>
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>{{ number_format($tx->amount, 4) }} {{ $tx->coin_type }}</strong>
+                                        @if($usdRate > 0)
+                                        <small class="text-white-50 d-block">≈ ${{ number_format($txUsdValue, 2) }}</small>
+                                        @endif
+                                    </div>
                                     <span class="badge status-{{ $tx->status }}">{{ $tx->status }}</span>
                                 </div>
                                 <small class="text-muted">{{ $tx->created_at->diffForHumans() }}</small>
@@ -424,16 +503,37 @@
                     <span>Coin:</span>
                     <strong>{{ $wallet->coin_type }}</strong>
                 </div>
+                @if($usdRate > 0)
+                <div class="info-item">
+                    <i class="bi bi-currency-dollar"></i>
+                    <span>USD Rate:</span>
+                    <strong>${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }}</strong>
+                </div>
+                @endif
                 <div class="info-item">
                     <i class="bi bi-cash-coin"></i>
                     <span>Minimum:</span>
                     <strong>0.001 {{ $wallet->coin_type }}</strong>
                 </div>
+                @if($usdRate > 0)
+                <div class="info-item">
+                    <i class="bi bi-currency-dollar"></i>
+                    <span>Min (USD):</span>
+                    <strong>${{ number_format(0.001 * $usdRate, 2) }}</strong>
+                </div>
+                @endif
                 <div class="info-item">
                     <i class="bi bi-lightning-charge"></i>
                     <span>Network Fee:</span>
                     <strong>0.001 {{ $wallet->coin_type }}</strong>
                 </div>
+                @if($usdRate > 0)
+                <div class="info-item">
+                    <i class="bi bi-currency-dollar"></i>
+                    <span>Fee (USD):</span>
+                    <strong>${{ number_format(0.001 * $usdRate, 2) }}</strong>
+                </div>
+                @endif
                 <div class="info-item">
                     <i class="bi bi-clock"></i>
                     <span>Processing:</span>
@@ -771,6 +871,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.875rem;
+    flex-wrap: wrap;
 }
 
 .balance-info i {
@@ -1485,6 +1586,10 @@
 
 @push('scripts')
 <script>
+    // USD Rate from PHP
+    const usdRate = {{ $usdRate }};
+    const coinType = '{{ $wallet->coin_type }}';
+    
     // Step Navigation
     let currentStep = 1;
     
@@ -1582,12 +1687,27 @@
             amount = Math.floor(amount * 1000) / 1000;
             
             document.getElementById('amount').value = amount;
+            updateUsdValue();
             updateReview();
         });
     });
     
+    // USD Value Update
+    function updateUsdValue() {
+        if (usdRate > 0) {
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const usdValue = amount * usdRate;
+            document.getElementById('usdAmountDisplay').innerHTML = 
+                `<small class="text-white-50">≈ $${usdValue.toFixed(2)} USD</small>`;
+        }
+    }
+    
     // Real-time amount updates
-    document.getElementById('amount').addEventListener('input', updateReview);
+    document.getElementById('amount').addEventListener('input', function() {
+        updateUsdValue();
+        updateReview();
+    });
+    
     document.getElementById('address').addEventListener('input', updateReview);
     
     @if($wallet->coin_type !== 'USDT')
@@ -1609,6 +1729,21 @@
             total.toFixed(3) + ' {{ $wallet->coin_type }}';
         document.getElementById('reviewAddress').textContent = 
             address.length > 30 ? address.substring(0, 30) + '...' : address;
+        
+        // Update USD values if rate exists
+        if (usdRate > 0) {
+            const amountUsd = amount * usdRate;
+            const feeUsd = fee * usdRate;
+            const totalUsd = total * usdRate;
+            
+            const reviewUsdAmount = document.getElementById('reviewUsdAmount');
+            const reviewFeeUsd = document.getElementById('reviewFeeUsd');
+            const reviewTotalUsd = document.getElementById('reviewTotalUsd');
+            
+            if (reviewUsdAmount) reviewUsdAmount.textContent = '$' + amountUsd.toFixed(2);
+            if (reviewFeeUsd) reviewFeeUsd.textContent = '$' + feeUsd.toFixed(2);
+            if (reviewTotalUsd) reviewTotalUsd.textContent = '$' + totalUsd.toFixed(2);
+        }
         
         @if($wallet->coin_type !== 'USDT')
         const memo = document.getElementById('memo').value;

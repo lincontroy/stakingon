@@ -22,10 +22,23 @@
                             </p>
                         </div>
                     </div>
+                    @php
+                        $usdRate = 0;
+                        if(in_array($wallet->coin_type, ['STEEM', 'HIVE', 'USDT'])) {
+                            $usdRate = (float) (env($wallet->coin_type.'USD', 
+                                $wallet->coin_type == 'STEEM' ? 0.051 : 
+                                ($wallet->coin_type == 'HIVE' ? 0.0674 : 1)
+                            ));
+                        }
+                        $totalUsd = $wallet->balance * $usdRate;
+                    @endphp
                     <div class="wallet-info-badge px-4 py-3">
                         <div class="balance-display">
                             <span class="d-block small text-white-50 mb-1 fw-medium">Current Balance</span>
-                            <strong class="fs-3 fw-bold text-white">{{ number_format($wallet->balance, 3) }} {{ $wallet->coin_type }}</strong>
+                            <strong class="fs-3 fw-bold text-white">{{ number_format($wallet->balance, 4) }} {{ $wallet->coin_type }}</strong>
+                            @if($usdRate > 0)
+                            <small class="d-block text-white-50 mt-1">≈ ${{ number_format($totalUsd, 2) }} USD</small>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -51,6 +64,19 @@
                 </div>
                 
                 <div class="card-body p-4">
+                    <!-- Exchange Rate Info -->
+                    @if($usdRate > 0)
+                    <div class="exchange-rate-info mb-4 p-3" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 14px;">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-currency-exchange text-success"></i>
+                                <span class="small text-white-50">Current Exchange Rate:</span>
+                            </div>
+                            <strong class="text-white">1 {{ $wallet->coin_type }} = ${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }} USD</strong>
+                        </div>
+                    </div>
+                    @endif
+
                     <!-- Step 1: Copy Details -->
                     <div class="deposit-step active" id="step1">
                         <div class="step-header d-flex align-items-center gap-4 pb-4 mb-4">
@@ -80,9 +106,8 @@
                                     <code class="flex-grow-1 small text-white bg-transparent border-0">
                                         @if($wallet->coin_type === 'HIVE')
                                             stakeonhive
-
                                         @elseif($wallet->coin_type === 'USDT')
-                                        THsZkYq3hcbDGE4pNPoyGns9nwp8swS84P
+                                            THsZkYq3hcbDGE4pNPoyGns9nwp8swS84P
                                         @elseif($wallet->coin_type === 'STEEM')
                                             stakeonsteem
                                         @endif
@@ -96,8 +121,6 @@
                         </div>
                         
                         <!-- Copy All Button -->
-                   
-                        
                         <div class="d-flex justify-content-end pt-4 border-top border-white-10">
                             <button class="btn-next d-inline-flex align-items-center gap-2 px-4 py-2 border-0 fw-medium" onclick="nextStep()">
                                 Next: Send Funds
@@ -137,12 +160,15 @@
                                                 stakeonsteem
                                             @endif
                                         </code>
+                                        @if($usdRate > 0)
+                                        <div class="mt-2 small text-white-50">
+                                            <i class="bi bi-info-circle"></i> 
+                                            Current value: 1 {{ $wallet->coin_type }} = ${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }}
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                            
-                            
-                      
                             
                             <div class="guide-arrow text-white-50">
                                 <i class="bi bi-arrow-down fs-4"></i>
@@ -208,6 +234,13 @@
                                 <i class="bi bi-clock"></i>
                                 <span class="small">Estimated time: 1-3 minutes</span>
                             </div>
+                            
+                            @if($usdRate > 0)
+                            <div class="d-flex align-items-center justify-content-center gap-2 text-success mb-2">
+                                <i class="bi bi-currency-dollar"></i>
+                                <span class="small fw-medium">1 {{ $wallet->coin_type }} = ${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }}</span>
+                            </div>
+                            @endif
                             
                             <div class="d-flex align-items-center justify-content-center gap-2 text-success">
                                 <i class="bi bi-check-circle-fill"></i>
@@ -305,6 +338,18 @@
                                 <p class="small text-white-50 mb-0">Enterprise-grade security for your funds</p>
                             </div>
                         </div>
+
+                        @if($usdRate > 0)
+                        <div class="d-flex gap-3">
+                            <div class="notice-item-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);">
+                                <i class="bi bi-currency-dollar fs-6"></i>
+                            </div>
+                            <div>
+                                <h6 class="fs-6 fw-semibold text-white mb-1">Exchange Rate</h6>
+                                <p class="small text-white-50 mb-0">1 {{ $wallet->coin_type }} = ${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }}</p>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -332,13 +377,21 @@
                     @if($recentTransactions->count() > 0)
                         <div class="vstack gap-3 mb-4">
                             @foreach($recentTransactions as $tx)
+                            @php
+                                $txUsdValue = $tx->amount * $usdRate;
+                            @endphp
                             <div class="d-flex align-items-start gap-3">
                                 <div class="activity-item-icon d-flex align-items-center justify-content-center flex-shrink-0">
                                     <i class="bi bi-arrow-down-circle text-success"></i>
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <strong class="text-white">{{ number_format($tx->amount, 3) }} {{ $tx->coin_type }}</strong>
+                                        <div>
+                                            <strong class="text-white">{{ number_format($tx->amount, 4) }} {{ $tx->coin_type }}</strong>
+                                            @if($usdRate > 0)
+                                            <small class="text-white-50 d-block">≈ ${{ number_format($txUsdValue, 2) }}</small>
+                                            @endif
+                                        </div>
                                         <span class="badge status-{{ $tx->status }} small fw-medium px-2 py-1">{{ $tx->status }}</span>
                                     </div>
                                     <small class="text-white-50">{{ $tx->created_at->diffForHumans() }}</small>
@@ -371,6 +424,15 @@
                             <span class="flex-grow-1 small text-white-50">Coin:</span>
                             <strong class="small text-white">{{ $wallet->coin_type }}</strong>
                         </div>
+                        
+                        @if($usdRate > 0)
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-currency-dollar d-flex align-items-center justify-content-center flex-shrink-0"></i>
+                            <span class="flex-grow-1 small text-white-50">USD Rate:</span>
+                            <strong class="small text-white">${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }}</strong>
+                        </div>
+                        @endif
+                        
                         <div class="d-flex align-items-center gap-3">
                             <i class="bi bi-infinity d-flex align-items-center justify-content-center flex-shrink-0"></i>
                             <span class="flex-grow-1 small text-white-50">Minimum:</span>

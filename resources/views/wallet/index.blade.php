@@ -17,87 +17,85 @@
                             <i class="bi bi-shield-check me-2"></i>Manage your cryptocurrency wallets
                         </p>
                     </div>
-                    <div class="wallet-stats-header">
+                    <div class="wallet-stats-header d-flex gap-3">
                         <div class="stat-badge px-4 py-3">
                             <span class="d-block small text-white-50 fw-medium mb-1">Total Wallets</span>
                             <strong class="fs-3 fw-bold text-white">{{ $wallets->count() }}</strong>
                         </div>
+                        @php
+                            $totalUsdValue = 0;
+                            $usdRates = [
+                                'STEEM' => (float) (env('STEEMUSD') ?? 0.051),
+                                'HIVE' => (float) (env('HIVEUSD') ?? 0.0674),
+                                'USDT' => (float) (env('USDTUSD') ?? 1),
+                            ];
+                            foreach($wallets as $wallet) {
+                                if(isset($usdRates[$wallet->coin_type])) {
+                                    $totalUsdValue += $wallet->balance * $usdRates[$wallet->coin_type];
+                                }
+                            }
+                        @endphp
+                        @if($totalUsdValue > 0)
+                        <div class="stat-badge px-4 py-3" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%);">
+                            <span class="d-block small text-white-50 fw-medium mb-1">Portfolio Value (USD)</span>
+                            <strong class="fs-3 fw-bold text-white">${{ number_format($totalUsdValue, 2) }}</strong>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Create New Wallet -->
-    <div class="card create-wallet-modern border-0 mb-5">
-        <div class="card-body p-4">
-            <div class="create-wallet-header d-flex align-items-center gap-3 mb-4">
-                <div class="create-icon d-flex align-items-center justify-content-center">
-                    <i class="bi bi-plus-circle-fill fs-4"></i>
-                </div>
-                <div>
-                    <h5 class="fs-5 fw-semibold text-white mb-1">Create New Wallet</h5>
-                    <p class="text-white-50 small mb-0">Add a new cryptocurrency wallet to your account</p>
-                </div>
-            </div>
-            
-            <form action="{{ route('wallet.create') }}" method="POST">
-                @csrf
-                <div class="row g-4 align-items-end">
-                    <div class="col-md-8 col-lg-9">
-                        <div class="input-modern">
-                            <label for="coin_type" class="form-label d-flex align-items-center gap-2 small fw-medium text-white-50 mb-2">
-                                <i class="bi bi-currency-bitcoin"></i>Select Cryptocurrency
-                            </label>
-                            <select class="form-select-modern w-100" id="coin_type" name="coin_type" required>
-                                <option value="">Choose a cryptocurrency...</option>
-                                @foreach($supportedCoins as $coin)
-                                <option value="{{ $coin['type'] }}">
-                                    {{ $coin['name'] }} ({{ $coin['type'] }})
-                                </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <button type="submit" class="btn btn-primary w-100 create-wallet-btn d-inline-flex align-items-center justify-content-center gap-2 border-0 py-3 fw-medium">
-                            <i class="bi bi-plus-lg"></i>Create Wallet
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+
 
     <!-- Wallets Grid -->
     @if($wallets->count() > 0)
     <div class="row g-4 mb-5">
         @foreach($wallets as $wallet)
+        @php
+            $usdRate = 0;
+            if(in_array($wallet->coin_type, ['STEEM', 'HIVE', 'USDT'])) {
+                $usdRate = (float) (env($wallet->coin_type.'USD', 
+                    $wallet->coin_type == 'STEEM' ? 0.051 : 
+                    ($wallet->coin_type == 'HIVE' ? 0.0674 : 1)
+                ));
+            }
+            $totalUsd = $wallet->balance * $usdRate;
+            $availableUsd = $wallet->available_balance * $usdRate;
+            $stakingUsd = $wallet->staking_balance * $usdRate;
+        @endphp
         <div class="col-md-6 col-lg-4">
             <div class="wallet-card-modern border-0 p-4 h-100">
                 <div class="wallet-header d-flex align-items-start gap-3 mb-4">
-                    <div class="wallet-icon-large d-flex align-items-center justify-content-center flex-shrink-0" style="background: linear-gradient(135deg, {{ $wallet->gradient_start ?? '#f59e0b' }} 0%, {{ $wallet->gradient_end ?? '#fbbf24' }} 100%);">
-                        <i class="bi {{ $wallet->coinIcon }} fs-2"></i>
+                    <div class="wallet-icon-large d-flex align-items-center justify-content-center flex-shrink-0" style="background: linear-gradient(135deg, {{ $wallet->gradient_start ?? ($wallet->coin_type == 'USDT' ? '#22c55e' : '#f59e0b') }} 0%, {{ $wallet->gradient_end ?? ($wallet->coin_type == 'USDT' ? '#10b981' : '#fbbf24') }} 100%);">
+                        <i class="bi {{ $wallet->coinIcon ?? ($wallet->coin_type == 'USDT' ? 'bi-currency-dollar' : 'bi-coin') }} fs-2"></i>
                     </div>
                     <div class="flex-grow-1">
                         <h4 class="fs-4 fw-semibold text-white mb-1">{{ $wallet->coin_type }}</h4>
                         <span class="coin-name d-block small text-white-50">
                             {{ 
-                                ['HIVE' => 'Hive', 'STEEM' => 'Steem', 'BTC' => 'Bitcoin', 
-                                 'ETH' => 'Ethereum', 'BNB' => 'Binance Coin', 'SOL' => 'Solana', 
-                                 'ADA' => 'Cardano'][$wallet->coin_type] ?? $wallet->coin_type 
+                                ['HIVE' => 'Hive', 'STEEM' => 'Steem', 'USDT' => 'Tether USD',
+                                 'BTC' => 'Bitcoin', 'ETH' => 'Ethereum', 'BNB' => 'Binance Coin', 
+                                 'SOL' => 'Solana', 'ADA' => 'Cardano'][$wallet->coin_type] ?? $wallet->coin_type 
                             }}
                         </span>
+                        @if($usdRate > 0)
+                        <span class="d-block small text-white-50 mt-1">
+                            <i class="bi bi-currency-dollar"></i> 1 {{ $wallet->coin_type }} = ${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }}
+                        </span>
+                        @endif
                     </div>
                     <div class="wallet-balance-badge px-3 py-2 text-center">
                         <span class="d-block small text-white-50 fw-medium mb-1">Balance</span>
                         <strong class="d-block fs-5 fw-semibold text-white">{{ number_format($wallet->balance, 4) }}</strong>
+                        @if($usdRate > 0)
+                        <small class="d-block text-white-50 small mt-1">${{ number_format($totalUsd, 2) }}</small>
+                        @endif
                     </div>
                 </div>
                 
-               
-                
-                <!-- Balance Details -->
+                <!-- Balance Details with USD -->
                 <div class="wallet-balance-details d-flex align-items-center gap-3 p-3 mb-4">
                     <div class="balance-item d-flex align-items-center gap-3 flex-grow-1">
                         <div class="balance-icon available d-flex align-items-center justify-content-center">
@@ -106,6 +104,9 @@
                         <div class="balance-info">
                             <small class="d-block text-white-50 small fw-medium mb-1">Available</small>
                             <div class="fw-semibold text-white">{{ number_format($wallet->available_balance, 4) }}</div>
+                            @if($usdRate > 0)
+                            <small class="d-block text-white-50 small">${{ number_format($availableUsd, 2) }}</small>
+                            @endif
                         </div>
                     </div>
                     <div class="balance-divider"></div>
@@ -116,6 +117,9 @@
                         <div class="balance-info">
                             <small class="d-block text-white-50 small fw-medium mb-1">Staked</small>
                             <div class="fw-semibold text-white">{{ number_format($wallet->staking_balance, 4) }}</div>
+                            @if($usdRate > 0)
+                            <small class="d-block text-white-50 small">${{ number_format($stakingUsd, 2) }}</small>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -160,14 +164,26 @@
         <div class="card-body p-4">
             <div class="row g-3">
                 @foreach($supportedCoins as $coin)
+                @php
+                    $usdRate = 0;
+                    if(in_array($coin['type'], ['STEEM', 'HIVE', 'USDT'])) {
+                        $usdRate = (float) (env($coin['type'].'USD', 
+                            $coin['type'] == 'STEEM' ? 0.051 : 
+                            ($coin['type'] == 'HIVE' ? 0.0674 : 1)
+                        ));
+                    }
+                @endphp
                 <div class="col-6 col-md-4 col-lg-3">
                     <div class="coin-item-modern d-flex align-items-center gap-3 p-3 h-100">
-                        <div class="coin-icon d-flex align-items-center justify-content-center flex-shrink-0" style="background: linear-gradient(135deg, {{ $coin['gradient_start'] ?? '#f59e0b' }} 0%, {{ $coin['gradient_end'] ?? '#fbbf24' }} 100%);">
-                            <i class="bi {{ $coin['icon'] }} fs-4"></i>
+                        <div class="coin-icon d-flex align-items-center justify-content-center flex-shrink-0" style="background: linear-gradient(135deg, {{ $coin['gradient_start'] ?? ($coin['type'] == 'USDT' ? '#22c55e' : '#f59e0b') }} 0%, {{ $coin['gradient_end'] ?? ($coin['type'] == 'USDT' ? '#10b981' : '#fbbf24') }} 100%);">
+                            <i class="bi {{ $coin['icon'] ?? ($coin['type'] == 'USDT' ? 'bi-currency-dollar' : 'bi-coin') }} fs-4"></i>
                         </div>
                         <div class="coin-info">
                             <div class="coin-symbol fw-semibold text-white">{{ $coin['type'] }}</div>
                             <small class="coin-name d-block text-white-50 small">{{ $coin['name'] }}</small>
+                            @if($usdRate > 0)
+                            <small class="d-block text-white-50 small mt-1">${{ number_format($usdRate, $coin['type'] == 'USDT' ? 2 : 3) }}</small>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -199,6 +215,15 @@
                                 @foreach($supportedCoins as $coin)
                                 <option value="{{ $coin['type'] }}">
                                     {{ $coin['name'] }} ({{ $coin['type'] }})
+                                    @if(in_array($coin['type'], ['STEEM', 'HIVE', 'USDT']))
+                                        @php
+                                            $rate = env($coin['type'].'USD', 
+                                                $coin['type'] == 'STEEM' ? 0.051 : 
+                                                ($coin['type'] == 'HIVE' ? 0.0674 : 1)
+                                            );
+                                        @endphp
+                                        - ${{ number_format($rate, $coin['type'] == 'USDT' ? 2 : 3) }}
+                                    @endif
                                 </option>
                                 @endforeach
                             </select>
@@ -439,83 +464,6 @@ body {
     min-width: 90px;
 }
 
-/* Wallet Address */
-.wallet-address-section small {
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-wide);
-}
-
-.address-container {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: 14px;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.address-container:hover {
-    background: var(--bg-card-hover);
-    border-color: var(--border-medium);
-}
-
-.address-value {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    line-height: var(--leading-normal);
-    word-break: break-all;
-    padding-right: 60px;
-}
-
-.btn-copy-small {
-    position: absolute;
-    top: 50%;
-    right: 0.75rem;
-    transform: translateY(-50%);
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    color: var(--text-secondary);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    transition: all 0.2s ease;
-}
-
-.btn-copy-small:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-primary);
-    border-color: var(--border-medium);
-}
-
-.btn-copy-small.copied {
-    background: #10b981;
-    color: white;
-    border-color: #10b981;
-}
-
-.copy-hint {
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 0.375rem 0.75rem;
-    border-radius: 6px;
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    pointer-events: none;
-    white-space: nowrap;
-}
-
-.address-container:hover .copy-hint {
-    opacity: 1;
-}
-
 /* Balance Details */
 .wallet-balance-details {
     background: var(--bg-card);
@@ -704,6 +652,11 @@ body {
     .welcome-header .d-flex {
         flex-direction: column;
         text-align: center;
+    }
+    
+    .wallet-stats-header {
+        flex-direction: column;
+        width: 100%;
     }
     
     .wallet-header {

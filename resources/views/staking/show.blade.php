@@ -22,6 +22,14 @@
                             </p>
                         </div>
                     </div>
+                    @php
+                        $usdRates = [
+                            'STEEM' => (float) (env('STEEMUSD') ?? 0.051),
+                            'HIVE' => (float) (env('HIVEUSD') ?? 0.0674),
+                            'USDT' => (float) (env('USDTUSD') ?? 1),
+                        ];
+                        $poolUsdRate = $usdRates[$pool->coin_type] ?? 0;
+                    @endphp
                     <div class="apy-badge-modern d-flex flex-column align-items-center px-4 py-3">
                         <span class="apy-value display-6 fw-bold text-white lh-1">{{ number_format($pool->apy, 2) }}%</span>
                         <small class="small text-white-50 fw-medium">APY</small>
@@ -41,11 +49,18 @@
                         <div class="col-md-6">
                             <div class="pool-overview-card d-flex align-items-center gap-4 p-4 h-100">
                                 <div class="pool-icon-large d-flex align-items-center justify-content-center flex-shrink-0">
-                                    <i class="bi {{ $pool->coin_icon ?? 'bi-currency-bitcoin' }} fs-1"></i>
+                                    <i class="bi {{ $pool->coin_icon ?? ($pool->coin_type == 'USDT' ? 'bi-currency-dollar' : 'bi-currency-bitcoin') }} fs-1"></i>
                                 </div>
                                 <div class="pool-info">
                                     <h3 class="fs-2 fw-semibold text-white mb-1">{{ $pool->coin_type }}</h3>
                                     <p class="text-white-50 small mb-0">{{ $pool->name }} Pool</p>
+                                    @if($poolUsdRate > 0)
+                                    <div class="pool-rate mt-2">
+                                        <small class="text-white-50">
+                                            <i class="bi bi-currency-exchange me-1"></i>1 {{ $pool->coin_type }} = ${{ number_format($poolUsdRate, $pool->coin_type == 'USDT' ? 2 : 4) }}
+                                        </small>
+                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -58,6 +73,9 @@
                                 <div class="stat-item-modern p-3 text-center">
                                     <small class="d-block text-white-50 small fw-medium mb-2">Min Stake</small>
                                     <strong class="d-block fs-5 fw-semibold text-white">{{ number_format($pool->min_stake, 4) }}</strong>
+                                    @if($poolUsdRate > 0)
+                                    <small class="text-white-50 d-block">${{ number_format($pool->min_stake * $poolUsdRate, 2) }}</small>
+                                    @endif
                                 </div>
                                 <div class="stat-item-modern p-3 text-center">
                                     <small class="d-block text-white-50 small fw-medium mb-2">Max Stake</small>
@@ -68,10 +86,16 @@
                                             Unlimited
                                         @endif
                                     </strong>
+                                    @if($poolUsdRate > 0 && $pool->max_stake)
+                                    <small class="text-white-50 d-block">${{ number_format($pool->max_stake * $poolUsdRate, 2) }}</small>
+                                    @endif
                                 </div>
                                 <div class="stat-item-modern p-3 text-center">
                                     <small class="d-block text-white-50 small fw-medium mb-2">Total Staked</small>
-                                    <strong class="d-block fs-5 fw-semibold text-white">{{ number_format($pool->total_staked, 2) }}</strong>
+                                    <strong class="d-block fs-5 fw-semibold text-white">{{ number_format($pool->total_staked, 4) }}</strong>
+                                    @if($poolUsdRate > 0)
+                                    <small class="text-white-50 d-block">${{ number_format($pool->total_staked * $poolUsdRate, 2) }}</small>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -95,14 +119,24 @@
                                        min="{{ $pool->min_stake }}"
                                        @if($pool->max_stake) max="{{ $pool->max_stake }}" @endif
                                        placeholder="Enter amount to stake"
-                                       required>
+                                       required
+                                       oninput="updateUsdValue()">
                                 <span class="input-suffix position-absolute fw-medium">{{ $pool->coin_type }}</span>
                             </div>
+                            @if($poolUsdRate > 0)
+                            <div class="input-info d-flex align-items-center gap-2 small text-white-50 mt-2" id="usdAmountDisplay">
+                                <i class="bi bi-currency-dollar"></i>
+                                <span>≈ $0.00 USD</span>
+                            </div>
+                            @endif
                             <div class="input-info d-flex align-items-center gap-2 small text-white-50 mt-2">
                                 <i class="bi bi-info-circle"></i>
                                 <span>Available: 
                                     @if($wallet)
                                         <span id="availableBalance" class="text-success fw-medium">{{ number_format($wallet->available_balance, 8) }}</span> {{ $pool->coin_type }}
+                                        @if($poolUsdRate > 0)
+                                        <span class="text-white-50">(${{ number_format($wallet->available_balance * $poolUsdRate, 2) }})</span>
+                                        @endif
                                     @else
                                         <span class="text-danger">No wallet for {{ $pool->coin_type }}. Please create one first.</span>
                                     @endif
@@ -123,6 +157,9 @@
                                             <small class="d-block text-white-50 small fw-medium mb-3">Daily Reward</small>
                                             <div class="reward-value fs-2 fw-bold text-white mb-2 font-monospace" id="dailyReward">0</div>
                                             <small class="d-block text-white-50 small">{{ $pool->coin_type }}/day</small>
+                                            @if($poolUsdRate > 0)
+                                            <small class="d-block text-white-50 small mt-1" id="dailyRewardUsd">$0.00</small>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -130,6 +167,9 @@
                                             <small class="d-block text-white-50 small fw-medium mb-3">Duration Reward</small>
                                             <div class="reward-value fs-2 fw-bold text-white mb-2 font-monospace" id="durationReward">0</div>
                                             <small class="d-block text-white-50 small">{{ $pool->coin_type }} total</small>
+                                            @if($poolUsdRate > 0)
+                                            <small class="d-block text-white-50 small mt-1" id="durationRewardUsd">$0.00</small>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -137,6 +177,9 @@
                                             <div>
                                                 <small class="d-block text-white-50 small fw-medium mb-2">Total Return</small>
                                                 <div class="total-reward-value fs-2 fw-bold font-monospace" id="totalReward">0 {{ $pool->coin_type }}</div>
+                                                @if($poolUsdRate > 0)
+                                                <small class="d-block text-white-50 small mt-1" id="totalRewardUsd">$0.00</small>
+                                                @endif
                                             </div>
                                             <div class="apy-display text-end">
                                                 <small class="d-block text-white-50 small fw-medium mb-2">APY</small>
@@ -152,6 +195,9 @@
                         @if($wallet && $wallet->available_balance >= $pool->min_stake)
                         <button type="submit" class="btn btn-primary btn-lg w-100 stake-confirm-btn d-inline-flex align-items-center justify-content-center gap-2 border-0 py-3 fw-medium">
                             <i class="bi bi-lock-fill fs-5"></i>Confirm Stake
+                            @if($poolUsdRate > 0)
+                            <span class="badge bg-white bg-opacity-25 text-white ms-2" id="stakeTotalUsd">$0.00</span>
+                            @endif
                         </button>
                         @elseif(!$wallet)
                         <a href="{{ route('wallet.index') }}" class="btn btn-warning btn-lg w-100 d-inline-flex align-items-center justify-content-center gap-2 border-0 py-3 fw-medium">
@@ -224,6 +270,11 @@
             
             <!-- Wallet Card -->
             @if($wallet)
+            @php
+                $availableUsd = $wallet->available_balance * $poolUsdRate;
+                $stakedUsd = $wallet->staking_balance * $poolUsdRate;
+                $earnedUsd = $wallet->total_earned * $poolUsdRate;
+            @endphp
             <div class="card wallet-card-detail border-0">
                 <div class="card-header d-flex align-items-center gap-3 bg-transparent border-0 px-4 pt-4 pb-0">
                     <div class="wallet-icon-small d-flex align-items-center justify-content-center">
@@ -235,15 +286,30 @@
                     <div class="wallet-balance-detail vstack gap-3">
                         <div class="balance-item d-flex justify-content-between align-items-center pb-2">
                             <span class="small text-white-50">Available Balance</span>
-                            <strong class="small text-white fw-semibold">{{ number_format($wallet->available_balance, 8) }}</strong>
+                            <div class="text-end">
+                                <strong class="small text-white fw-semibold d-block">{{ number_format($wallet->available_balance, 8) }}</strong>
+                                @if($poolUsdRate > 0)
+                                <small class="text-white-50">${{ number_format($availableUsd, 2) }}</small>
+                                @endif
+                            </div>
                         </div>
                         <div class="balance-item d-flex justify-content-between align-items-center pb-2">
                             <span class="small text-white-50">Staked Balance</span>
-                            <strong class="small text-white fw-semibold">{{ number_format($wallet->staking_balance, 8) }}</strong>
+                            <div class="text-end">
+                                <strong class="small text-white fw-semibold d-block">{{ number_format($wallet->staking_balance, 8) }}</strong>
+                                @if($poolUsdRate > 0)
+                                <small class="text-white-50">${{ number_format($stakedUsd, 2) }}</small>
+                                @endif
+                            </div>
                         </div>
                         <div class="balance-item d-flex justify-content-between align-items-center pb-2">
                             <span class="small text-white-50">Total Earned</span>
-                            <strong class="small text-success fw-semibold">{{ number_format($wallet->total_earned, 8) }}</strong>
+                            <div class="text-end">
+                                <strong class="small text-success fw-semibold d-block">{{ number_format($wallet->total_earned, 8) }}</strong>
+                                @if($poolUsdRate > 0)
+                                <small class="text-success">${{ number_format($earnedUsd, 2) }}</small>
+                                @endif
+                            </div>
                         </div>
                     </div>
                     <div class="wallet-address-detail p-3 mt-3">
@@ -409,6 +475,13 @@ body {
     box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.4);
 }
 
+.pool-rate {
+    font-size: var(--text-xs);
+    border-top: 1px dashed var(--border-light);
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+}
+
 /* Stats Grid */
 .stats-grid {
     display: grid;
@@ -421,6 +494,7 @@ body {
     border: 1px solid var(--border-light);
     border-radius: 18px;
     transition: all 0.2s ease;
+    padding: 1rem;
 }
 
 .stat-item-modern:hover {
@@ -577,6 +651,10 @@ body {
     font-feature-settings: "tnum";
 }
 
+.balance-item small {
+    font-size: var(--text-xs);
+}
+
 .wallet-address-detail {
     background: var(--bg-card);
     border: 1px solid var(--border-light);
@@ -599,6 +677,12 @@ body {
 .stake-confirm-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.5);
+}
+
+.badge {
+    font-size: var(--text-sm);
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
 }
 
 /* Responsive */
@@ -664,10 +748,31 @@ body {
 <script>
     const apy = {{ $pool->apy }};
     const durationMinutes = {{ $pool->duration_minutes }};
+    const usdRate = {{ $poolUsdRate }};
+    const coinType = '{{ $pool->coin_type }}';
     
     function formatNumber(value) {
         if (value === 0) return '0';
         return value.toFixed(8).replace(/\.?0+$/, '');
+    }
+    
+    function updateUsdValue() {
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const usdDisplay = document.getElementById('usdAmountDisplay');
+        const stakeTotalUsd = document.getElementById('stakeTotalUsd');
+        
+        if (usdRate > 0) {
+            const usdValue = amount * usdRate;
+            if (usdDisplay) {
+                usdDisplay.innerHTML = `
+                    <i class="bi bi-currency-dollar"></i>
+                    <span>≈ $${usdValue.toFixed(2)} USD</span>
+                `;
+            }
+            if (stakeTotalUsd) {
+                stakeTotalUsd.textContent = `$${usdValue.toFixed(2)}`;
+            }
+        }
     }
     
     function calculateRewards() {
@@ -677,10 +782,20 @@ body {
         const durationRewardEl = document.getElementById('durationReward');
         const totalRewardEl = document.getElementById('totalReward');
         
+        const dailyRewardUsdEl = document.getElementById('dailyRewardUsd');
+        const durationRewardUsdEl = document.getElementById('durationRewardUsd');
+        const totalRewardUsdEl = document.getElementById('totalRewardUsd');
+        
         if (amount <= 0 || isNaN(amount)) {
             dailyRewardEl.textContent = '0';
             durationRewardEl.textContent = '0';
             totalRewardEl.textContent = '0 {{ $pool->coin_type }}';
+            
+            if (usdRate > 0) {
+                if (dailyRewardUsdEl) dailyRewardUsdEl.textContent = '$0.00';
+                if (durationRewardUsdEl) durationRewardUsdEl.textContent = '$0.00';
+                if (totalRewardUsdEl) totalRewardUsdEl.textContent = '$0.00';
+            }
             return;
         }
         
@@ -698,12 +813,26 @@ body {
         dailyRewardEl.textContent = formatNumber(dailyReward);
         durationRewardEl.textContent = formatNumber(durationReward);
         totalRewardEl.textContent = formatNumber(totalReward) + ' {{ $pool->coin_type }}';
+        
+        if (usdRate > 0) {
+            const dailyRewardUsd = dailyReward * usdRate;
+            const durationRewardUsd = durationReward * usdRate;
+            const totalRewardUsd = totalReward * usdRate;
+            
+            if (dailyRewardUsdEl) dailyRewardUsdEl.textContent = `$${dailyRewardUsd.toFixed(2)}`;
+            if (durationRewardUsdEl) durationRewardUsdEl.textContent = `$${durationRewardUsd.toFixed(2)}`;
+            if (totalRewardUsdEl) totalRewardUsdEl.textContent = `$${totalRewardUsd.toFixed(2)}`;
+        }
     }
     
     const amountInput = document.getElementById('amount');
     if (amountInput) {
-        amountInput.addEventListener('input', calculateRewards);
+        amountInput.addEventListener('input', function() {
+            calculateRewards();
+            updateUsdValue();
+        });
         calculateRewards();
+        updateUsdValue();
     }
 </script>
 @endpush

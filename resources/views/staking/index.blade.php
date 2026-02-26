@@ -34,14 +34,30 @@
                         </div>
                         
                         <!-- Quick Stats Cards -->
+                        @php
+                            $usdRates = [
+                                'STEEM' => (float) (env('STEEMUSD') ?? 0.051),
+                                'HIVE' => (float) (env('HIVEUSD') ?? 0.0674),
+                                'USDT' => (float) (env('USDTUSD') ?? 1),
+                            ];
+                            
+                            $totalLockedUsd = 0;
+                            foreach($pools as $pool) {
+                                if(isset($usdRates[$pool->coin_type])) {
+                                    $totalLockedUsd += $pool->total_staked * $usdRates[$pool->coin_type];
+                                }
+                            }
+                        @endphp
+                        
                         <div class="quick-stats">
                             <div class="stat-card">
                                 <div class="stat-icon">
                                     <i class="bi bi-currency-dollar"></i>
                                 </div>
                                 <div class="stat-info">
-                                    <h3>{{ number_format($pools->sum('total_staked'), 2) }}</h3>
+                                    <h3>{{ number_format($pools->sum('total_staked'), 4) }}</h3>
                                     <p>Total Value Locked</p>
+                                    <small class="text-white-50">≈ ${{ number_format($totalLockedUsd, 2) }}</small>
                                 </div>
                             </div>
                             <div class="stat-card">
@@ -106,13 +122,18 @@
         <!-- Enhanced Staking Pools Grid -->
         <div class="row g-4 mb-5">
             @foreach($pools as $pool)
+            @php
+                $poolUsdRate = $usdRates[$pool->coin_type] ?? 0;
+                $totalStakedUsd = $pool->total_staked * $poolUsdRate;
+                $minStakeUsd = $pool->min_stake * $poolUsdRate;
+            @endphp
             <div class="col-12 col-md-6 col-xl-4">
                 <div class="pool-card-premium">
                     <!-- Card Header with Gradient -->
                     <div class="pool-card-header">
                         <div class="pool-badge-container">
-                            <div class="pool-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
-                                <i class="bi {{ $pool->coin_icon ?? 'bi-currency-bitcoin' }}"></i>
+                            <div class="pool-icon" style="background: linear-gradient(135deg, {{ $pool->coin_type == 'USDT' ? '#22c55e' : '#f59e0b' }} 0%, {{ $pool->coin_type == 'USDT' ? '#10b981' : '#fbbf24' }} 100%);">
+                                <i class="bi {{ $pool->coin_icon ?? ($pool->coin_type == 'USDT' ? 'bi-currency-dollar' : 'bi-currency-bitcoin') }}"></i>
                             </div>
                             <div class="apy-badge-premium">
                                 <div class="apy-glow"></div>
@@ -129,6 +150,14 @@
                         </div>
                         
                         <p class="pool-desc">{{ $pool->description ?? 'Earn passive income by staking your crypto with industry-leading returns.' }}</p>
+                        
+                        @if($poolUsdRate > 0)
+                        <div class="pool-rate mt-2">
+                            <small class="text-white-50">
+                                <i class="bi bi-currency-exchange me-1"></i>1 {{ $pool->coin_type }} = ${{ number_format($poolUsdRate, $pool->coin_type == 'USDT' ? 2 : 4) }}
+                            </small>
+                        </div>
+                        @endif
                     </div>
                     
                     <!-- Card Stats Grid -->
@@ -150,6 +179,9 @@
                             <div class="stat-details">
                                 <span class="stat-label">Min Stake</span>
                                 <span class="stat-value">{{ number_format($pool->min_stake, 4) }}</span>
+                                @if($poolUsdRate > 0)
+                                <small class="text-white-50">${{ number_format($minStakeUsd, 2) }}</small>
+                                @endif
                             </div>
                         </div>
                         
@@ -159,7 +191,10 @@
                             </div>
                             <div class="stat-details">
                                 <span class="stat-label">Total Staked</span>
-                                <span class="stat-value">{{ number_format($pool->total_staked, 2) }}</span>
+                                <span class="stat-value">{{ number_format($pool->total_staked, 4) }}</span>
+                                @if($poolUsdRate > 0)
+                                <small class="text-white-50">${{ number_format($totalStakedUsd, 2) }}</small>
+                                @endif
                             </div>
                         </div>
                         
@@ -212,6 +247,11 @@
                 @if($activeStakes->count() > 0)
                     <div class="stakes-list">
                         @foreach($activeStakes as $stake)
+                        @php
+                            $stakeUsdRate = $usdRates[$stake->stakingPool->coin_type] ?? 0;
+                            $stakedUsd = $stake->amount * $stakeUsdRate;
+                            $rewardUsd = $stake->expected_reward * $stakeUsdRate;
+                        @endphp
                         <div class="stake-item">
                             <div class="stake-main">
                                 <div class="stake-pool-info">
@@ -228,6 +268,9 @@
                                     <div class="stake-detail">
                                         <span class="detail-label">Staked Amount</span>
                                         <span class="detail-value">{{ number_format($stake->amount, 4) }}</span>
+                                        @if($stakeUsdRate > 0)
+                                        <small class="text-white-50">${{ number_format($stakedUsd, 2) }}</small>
+                                        @endif
                                     </div>
                                     
                                     <div class="stake-detail">
@@ -236,6 +279,9 @@
                                             <i class="bi bi-trophy-fill"></i>
                                             {{ number_format($stake->expected_reward, 4) }}
                                         </span>
+                                        @if($stakeUsdRate > 0)
+                                        <small class="text-success">${{ number_format($rewardUsd, 2) }}</small>
+                                        @endif
                                     </div>
                                     
                                     <div class="stake-detail">
@@ -285,6 +331,11 @@
                                 <div class="status-pending">
                                     <i class="bi bi-hourglass-split"></i>
                                     <span>In Progress</span>
+                                    @if($stakeUsdRate > 0)
+                                    <small class="d-block text-white-50 mt-1">
+                                        ≈ ${{ number_format($stakedUsd + $rewardUsd, 2) }} total value
+                                    </small>
+                                    @endif
                                 </div>
                                 @endif
                             </div>
@@ -335,6 +386,11 @@
                 @if($completedStakes->count() > 0)
                     <div class="history-grid">
                         @foreach($completedStakes as $stake)
+                        @php
+                            $historyUsdRate = $usdRates[$stake->stakingPool->coin_type] ?? 0;
+                            $stakedUsd = $stake->amount * $historyUsdRate;
+                            $rewardUsd = ($stake->actual_reward ?? $stake->expected_reward) * $historyUsdRate;
+                        @endphp
                         <div class="history-card">
                             <div class="history-header">
                                 <div class="history-pool">
@@ -363,12 +419,18 @@
                                 <div class="history-stat">
                                     <span class="history-label">Amount Staked</span>
                                     <span class="history-value">{{ number_format($stake->amount, 4) }}</span>
+                                    @if($historyUsdRate > 0)
+                                    <small class="text-white-50 d-block">${{ number_format($stakedUsd, 2) }}</small>
+                                    @endif
                                 </div>
                                 <div class="history-stat">
                                     <span class="history-label">Reward Earned</span>
                                     <span class="history-value reward">
                                         {{ number_format($stake->actual_reward ?? $stake->expected_reward, 4) }}
                                     </span>
+                                    @if($historyUsdRate > 0)
+                                    <small class="text-success d-block">${{ number_format($rewardUsd, 2) }}</small>
+                                    @endif
                                 </div>
                                 <div class="history-stat">
                                     <span class="history-label">Completed On</span>
@@ -655,6 +717,12 @@
     margin: 0;
 }
 
+.stat-info small {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
 /* Header Decoration */
 .header-decoration {
     position: absolute;
@@ -903,7 +971,14 @@
     font-size: 0.875rem;
     color: var(--color-text-secondary);
     line-height: 1.6;
-    margin: 0;
+    margin: 0 0 var(--spacing-md) 0;
+}
+
+.pool-rate {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    border-top: 1px dashed var(--color-border);
+    padding-top: var(--spacing-sm);
 }
 
 .pool-stats-grid {
@@ -918,7 +993,7 @@
 
 .stat-box {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--spacing-sm);
 }
 
@@ -951,6 +1026,12 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-text-primary);
+}
+
+.stat-details small {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
 }
 
 .pool-card-footer {
@@ -1469,7 +1550,9 @@
 
 .stake-action {
     display: flex;
+    flex-direction: column;
     justify-content: flex-end;
+    align-items: flex-end;
 }
 
 .btn-claim {
@@ -1495,8 +1578,9 @@
 
 .status-pending {
     display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-xs);
     padding: var(--spacing-md) var(--spacing-xl);
     background: var(--color-surface-light);
     border: 1px solid var(--color-border);
@@ -1640,6 +1724,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .history-label {
@@ -1878,6 +1963,15 @@
         align-items: flex-start;
         gap: var(--spacing-md);
     }
+    
+    .stake-action {
+        align-items: stretch;
+    }
+    
+    .status-pending {
+        align-items: center;
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2052,10 +2146,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (statusPending) {
                         // Replace "In Progress" with "Claim" button
                         actionDiv.innerHTML = `
-                            <button class="btn-claim" onclick="this.closest('form')?.submit() || window.location.reload()">
-                                <i class="bi bi-gift-fill"></i>
-                                <span>Claim Rewards</span>
-                            </button>
+                            <form action="${stakeItem.querySelector('form')?.action || ''}" method="POST">
+                                @csrf
+                                <button class="btn-claim" type="submit">
+                                    <i class="bi bi-gift-fill"></i>
+                                    <span>Claim Rewards</span>
+                                </button>
+                            </form>
                         `;
                     }
                 }
@@ -2090,6 +2187,71 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }, 100);
+
+    // Filter tags functionality
+    document.querySelectorAll('.filter-tag').forEach(tag => {
+        tag.addEventListener('click', function() {
+            document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Here you can add filtering logic
+            const filterValue = this.textContent.trim().toLowerCase();
+            filterPools(filterValue);
+        });
+    });
+
+    // Sort select functionality
+    document.querySelector('.sort-select').addEventListener('change', function() {
+        const sortValue = this.value;
+        sortPools(sortValue);
+    });
+
+    function filterPools(filter) {
+        const poolCards = document.querySelectorAll('.pool-card-premium');
+        
+        poolCards.forEach(card => {
+            if (filter === 'all pools') {
+                card.style.display = 'flex';
+                return;
+            }
+            
+            const apy = parseFloat(card.querySelector('.apy-number').textContent);
+            const duration = card.querySelector('.stat-box:first-child .stat-value').textContent.toLowerCase();
+            
+            // Simple filtering logic - you can expand this
+            if (filter.includes('high') && apy > 10) {
+                card.style.display = 'flex';
+            } else if (filter.includes('short') && (duration.includes('day') || duration.includes('week'))) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function sortPools(sortBy) {
+        const poolGrid = document.querySelector('.row.g-4');
+        const poolCards = Array.from(document.querySelectorAll('.pool-card-premium'));
+        
+        poolCards.sort((a, b) => {
+            if (sortBy.includes('APY')) {
+                const apyA = parseFloat(a.querySelector('.apy-number').textContent);
+                const apyB = parseFloat(b.querySelector('.apy-number').textContent);
+                return sortBy.includes('High') ? apyB - apyA : apyA - apyB;
+            } else if (sortBy.includes('Duration')) {
+                // Implement duration sorting logic
+                return 0;
+            } else if (sortBy.includes('Min Stake')) {
+                const stakeA = parseFloat(a.querySelector('.stat-box:nth-child(2) .stat-value').textContent);
+                const stakeB = parseFloat(b.querySelector('.stat-box:nth-child(2) .stat-value').textContent);
+                return stakeA - stakeB;
+            }
+            return 0;
+        });
+        
+        // Reorder cards
+        poolCards.forEach(card => poolGrid.appendChild(card));
+    }
 });
 </script>
 @endsection
