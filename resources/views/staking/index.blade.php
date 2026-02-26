@@ -2146,7 +2146,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (statusPending) {
                         // Replace "In Progress" with "Claim" button
                         actionDiv.innerHTML = `
-                            <form action="${stakeItem.querySelector('form')?.action || ''}" method="POST">
+                            <form action="{{ route('staking.claim', $stake->id) }}" method="POST">
                                 @csrf
                                 <button class="btn-claim" type="submit">
                                     <i class="bi bi-gift-fill"></i>

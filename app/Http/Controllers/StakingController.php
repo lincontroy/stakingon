@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 
 use App\Models\StakingPool;
 use App\Models\StakingRecord;
+use App\Mail\RewardClaimedMail;
 use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class StakingController extends Controller
 {
@@ -164,7 +166,7 @@ class StakingController extends Controller
             $wallet->save();
             
             // Create reward transaction
-            Transaction::create([
+            $transaction = Transaction::create([
                 'user_id' => Auth::id(),
                 'txid' => 'REW-' . strtoupper(uniqid()),
                 'type' => 'reward',
@@ -180,11 +182,20 @@ class StakingController extends Controller
             ]);
             
             DB::commit();
+
+            // Send email notification
+            try {
+                Mail::to(Auth::user()->email)->send(new RewardClaimedMail($stakingRecord, $wallet, $transaction));
+            } catch (\Exception $e) {
+                // Log email error but don't stop the process
+                \Log::error('Failed to send reward email: ' . $e->getMessage());
+            }
             
-            return back()->with('success', "Reward of {$actualReward} {$stakingRecord->stakingPool->coin_type} claimed successfully");
+            return back()->with('success', "Reward of {$actualReward} {$stakingRecord->stakingPool->coin_type} claimed successfully. Check your email for confirmation!");
             
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Reward claim failed: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Failed to claim reward']);
         }
     }
