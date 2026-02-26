@@ -137,7 +137,7 @@
                                         <div class="balance-info">
                                             <i class="bi bi-wallet2 text-white-50"></i>
                                             <span class="text-white-50">Available:</span>
-                                            <strong class="{{ $hasBalance ? 'text' : 'text-white' }}">
+                                            <strong class="{{ $hasBalance ? '' : 'text-white' }}" style="color:white">
                                                 {{ number_format($wallet->available_balance, 4) }}
                                             </strong>
                                             @if($usdRate > 0)
@@ -1454,6 +1454,7 @@ body {
             const amountUsd = amount * usdRate;
             const feeUsd = fee * usdRate;
             const totalUsd = total * usdRate;
+            const usdto=totalUsd-2;
             
             const reviewUsdAmount = document.getElementById('reviewUsdAmount');
             const reviewFeeUsd = document.getElementById('reviewFeeUsd');
@@ -1461,7 +1462,7 @@ body {
             
             if (reviewUsdAmount) reviewUsdAmount.textContent = '$' + amountUsd.toFixed(2);
             if (reviewFeeUsd) reviewFeeUsd.textContent = '$' + feeUsd.toFixed(2);
-            if (reviewTotalUsd) reviewTotalUsd.textContent = '$' + totalUsd.toFixed(2);
+            if (reviewTotalUsd) reviewTotalUsd.textContent = '$' + usdto.toFixed(2);
         }
         
         @if($wallet->coin_type !== 'USDT')
