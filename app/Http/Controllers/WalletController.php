@@ -125,6 +125,7 @@ class WalletController extends Controller
             // Update wallet
             $wallet->available_balance -= $total;
             $wallet->balance -= $total;
+            $wallet->balance -= $total;
             $wallet->save();
             
             // Create withdrawal transaction

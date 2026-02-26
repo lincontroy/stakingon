@@ -160,7 +160,7 @@ class StakingController extends Controller
                 ->firstOrFail();
                 
             $wallet->staking_balance -= $stakingRecord->amount;
-            $wallet->available_balance += $stakingRecord->amount;
+            $wallet->available_balance  += $actualReward;
             $wallet->balance += $actualReward;
             $wallet->total_earned += $actualReward;
             $wallet->save();
