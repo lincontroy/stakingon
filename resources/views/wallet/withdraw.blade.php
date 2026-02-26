@@ -14,10 +14,10 @@
                             <i class="bi bi-arrow-left"></i>
                         </a>
                         <div>
-                            <h1 class="h2 fw-bold mb-1 gradient-text">
+                            <h1 class="h2 fw-bold mb-1 text-white">
                                 Withdraw {{ $wallet->coin_type }}
                             </h1>
-                            <p class="text-muted mb-0 small">
+                            <p class="text-white-50 mb-0 small">
                                 <i class="bi bi-wallet2 me-2"></i>Send funds to external address
                             </p>
                         </div>
@@ -36,10 +36,10 @@
                     
                     <div class="wallet-info-badge">
                         <div class="balance-display">
-                            <small>Available Balance</small>
-                            <strong class="fs-4">{{ number_format($wallet->available_balance, 4) }} {{ $wallet->coin_type }}</strong>
+                            <small class="text-white-75">Available Balance</small>
+                            <strong class="fs-4 text-white">{{ number_format($wallet->available_balance, 4) }} {{ $wallet->coin_type }}</strong>
                             @if($usdRate > 0)
-                            <small class="d-block mt-1 small opacity-75">≈ ${{ number_format($availableUsd, 2) }} USD</small>
+                            <small class="d-block mt-1 text-white-50">≈ ${{ number_format($availableUsd, 2) }} USD</small>
                             @endif
                         </div>
                     </div>
@@ -58,8 +58,8 @@
                         <i class="bi bi-arrow-up-circle-fill"></i>
                     </div>
                     <div class="header-content">
-                        <h5 class="mb-1">Withdraw {{ $wallet->coin_type }}</h5>
-                        <p class="text-muted small mb-0">Transfer funds to any {{ $wallet->coin_type }} address</p>
+                        <h5 class="mb-1 text-white">Withdraw {{ $wallet->coin_type }}</h5>
+                        <p class="text-white-50 small mb-0">Transfer funds to any {{ $wallet->coin_type }} address</p>
                     </div>
                 </div>
                 
@@ -84,22 +84,22 @@
                         <!-- Step 1: Amount -->
                         <div class="withdraw-step active" id="step1">
                             <div class="step-header">
-                                <div class="step-number">1</div>
+                                <div class="step-number text-white">1</div>
                                 <div class="step-title">
-                                    <h6 class="fw-semibold">Enter Amount</h6>
-                                    <p class="small mb-0">How much would you like to withdraw?</p>
+                                    <h6 class="fw-semibold text-white">Enter Amount</h6>
+                                    <p class="text-white-50 small mb-0">How much would you like to withdraw?</p>
                                 </div>
                             </div>
                             
                             <div class="amount-section">
                                 <div class="amount-input-container">
-                                    <label for="amount" class="form-label">
-                                        <i class="bi bi-cash-coin me-2"></i>Amount to Withdraw
+                                    <label for="amount" class="form-label text-white-75">
+                                        <i class="bi bi-cash-coin me-2 text-white-50"></i>Amount to Withdraw
                                     </label>
                                     
                                     <div class="amount-input-wrapper">
                                         <input type="number" 
-                                               class="form-control-modern" 
+                                               class="form-control-modern text-white" 
                                                id="amount" 
                                                name="amount"
                                                step="0.001"
@@ -109,7 +109,7 @@
                                                required
                                                autofocus
                                                oninput="updateUsdValue()">
-                                        <span class="input-suffix">{{ $wallet->coin_type }}</span>
+                                        <span class="input-suffix text-white-50">{{ $wallet->coin_type }}</span>
                                     </div>
                                     
                                     @if($usdRate > 0)
@@ -122,15 +122,15 @@
                                         <div class="quick-amounts">
                                             <small class="text-white-50">Quick:</small>
                                             <div class="quick-buttons">
-                                                <button type="button" class="btn-quick-amount" data-percent="25">25%</button>
-                                                <button type="button" class="btn-quick-amount" data-percent="50">50%</button>
-                                                <button type="button" class="btn-quick-amount" data-percent="75">75%</button>
-                                                <button type="button" class="btn-quick-amount" data-percent="100">MAX</button>
+                                                <button type="button" class="btn-quick-amount text-white" data-percent="25">25%</button>
+                                                <button type="button" class="btn-quick-amount text-white" data-percent="50">50%</button>
+                                                <button type="button" class="btn-quick-amount text-white" data-percent="75">75%</button>
+                                                <button type="button" class="btn-quick-amount text-white" data-percent="100">MAX</button>
                                             </div>
                                         </div>
                                         
                                         <div class="balance-info">
-                                            <i class="bi bi-wallet2"></i>
+                                            <i class="bi bi-wallet2 text-white-50"></i>
                                             <span class="text-white-50">Available:</span>
                                             <strong class="text-white">{{ number_format($wallet->available_balance, 4) }}</strong>
                                             @if($usdRate > 0)
@@ -151,23 +151,23 @@
                         <!-- Step 2: Address -->
                         <div class="withdraw-step" id="step2">
                             <div class="step-header">
-                                <div class="step-number">2</div>
+                                <div class="step-number text-white">2</div>
                                 <div class="step-title">
-                                    <h6 class="fw-semibold">Recipient Address</h6>
-                                    <p class="small mb-0">Where should we send the funds?</p>
+                                    <h6 class="fw-semibold text-white">Recipient Address</h6>
+                                    <p class="text-white-50 small mb-0">Where should we send the funds?</p>
                                 </div>
                             </div>
                             
                             <div class="address-section">
                                 <div class="address-input-container">
-                                    <label for="address" class="form-label">
-                                        <i class="bi bi-person-badge me-2"></i>Destination Address
+                                    <label for="address" class="form-label text-white-75">
+                                        <i class="bi bi-person-badge me-2 text-white-50"></i>Destination Address
                                     </label>
                                     
                                     <div class="input-with-icon">
-                                        <i class="bi bi-wallet2 input-icon"></i>
+                                        <i class="bi bi-wallet2 input-icon text-white-50"></i>
                                         <input type="text" 
-                                               class="form-control-modern" 
+                                               class="form-control-modern text-white" 
                                                id="address" 
                                                name="address"
                                                placeholder="Enter {{ $wallet->coin_type }} address"
@@ -177,13 +177,13 @@
                                     <!-- Memo Section - Hidden for USDT -->
                                     @if($wallet->coin_type !== 'USDT')
                                     <div class="memo-section">
-                                        <label for="memo" class="form-label">
-                                            <i class="bi bi-key me-2"></i>Memo (Optional)
+                                        <label for="memo" class="form-label text-white-75">
+                                            <i class="bi bi-key me-2 text-white-50"></i>Memo (Optional)
                                         </label>
                                         <div class="input-with-icon">
-                                            <i class="bi bi-chat-text input-icon"></i>
+                                            <i class="bi bi-chat-text input-icon text-white-50"></i>
                                             <input type="text" 
-                                                   class="form-control-modern" 
+                                                   class="form-control-modern text-white" 
                                                    id="memo" 
                                                    name="memo"
                                                    placeholder="Enter memo/tag if required"
@@ -201,7 +201,7 @@
                             </div>
                             
                             <div class="step-footer d-flex flex-column flex-sm-row gap-2">
-                                <button type="button" class="btn-prev" onclick="prevStep()">
+                                <button type="button" class="btn-prev text-white" onclick="prevStep()">
                                     <i class="bi bi-arrow-left me-2"></i>Back
                                 </button>
                                 <button type="button" class="btn-next" onclick="nextStep()">
@@ -213,10 +213,10 @@
                         <!-- Step 3: Review -->
                         <div class="withdraw-step" id="step3">
                             <div class="step-header">
-                                <div class="step-number">3</div>
+                                <div class="step-number text-white">3</div>
                                 <div class="step-title">
-                                    <h6 class="fw-semibold">Review & Confirm</h6>
-                                    <p class="small mb-0">Verify all details before submitting</p>
+                                    <h6 class="fw-semibold text-white">Review & Confirm</h6>
+                                    <p class="text-white-50 small mb-0">Verify all details before submitting</p>
                                 </div>
                             </div>
                             
@@ -224,31 +224,31 @@
                                 <!-- Transaction Summary -->
                                 <div class="summary-card">
                                     <div class="summary-header">
-                                        <i class="bi bi-receipt"></i>
-                                        <h6 class="mb-0">Transaction Summary</h6>
+                                        <i class="bi bi-receipt text-white-75"></i>
+                                        <h6 class="mb-0 text-white">Transaction Summary</h6>
                                     </div>
                                     
                                     <div class="summary-content">
                                         <div class="summary-item">
-                                            <span class="summary-label">Amount to Send</span>
-                                            <span class="summary-value" id="reviewAmount">0.000 {{ $wallet->coin_type }}</span>
+                                            <span class="summary-label text-white-50">Amount to Send</span>
+                                            <span class="summary-value text-white" id="reviewAmount">0.000 {{ $wallet->coin_type }}</span>
                                         </div>
                                         
                                         @if($usdRate > 0)
                                         <div class="summary-item">
-                                            <span class="summary-label">USD Value</span>
+                                            <span class="summary-label text-white-50">USD Value</span>
                                             <span class="summary-value text-success" id="reviewUsdAmount">$0.00</span>
                                         </div>
                                         @endif
                                         
                                         <div class="summary-item">
-                                            <span class="summary-label">Network Fee</span>
-                                            <span class="summary-value" id="reviewFee">0.001 {{ $wallet->coin_type }}</span>
+                                            <span class="summary-label text-white-50">Network Fee</span>
+                                            <span class="summary-value text-white" id="reviewFee">0.001 {{ $wallet->coin_type }}</span>
                                         </div>
                                         
                                         @if($usdRate > 0)
                                         <div class="summary-item">
-                                            <span class="summary-label">Fee (USD)</span>
+                                            <span class="summary-label text-white-50">Fee (USD)</span>
                                             <span class="summary-value text-warning" id="reviewFeeUsd">$0.00</span>
                                         </div>
                                         @endif
@@ -256,32 +256,32 @@
                                         <div class="summary-divider"></div>
                                         
                                         <div class="summary-item total">
-                                            <span class="summary-label fw-bold">Total Deduction</span>
+                                            <span class="summary-label fw-bold text-white-75">Total Deduction</span>
                                             <span class="summary-value text-danger fw-bold" id="reviewTotal">0.001 {{ $wallet->coin_type }}</span>
                                         </div>
                                         
                                         @if($usdRate > 0)
                                         <div class="summary-item">
-                                            <span class="summary-label">Total (USD)</span>
+                                            <span class="summary-label text-white-50">Total (USD)</span>
                                             <span class="summary-value text-danger" id="reviewTotalUsd">$0.00</span>
                                         </div>
                                         @endif
                                         
                                         <div class="summary-item">
-                                            <span class="summary-label">Recipient</span>
-                                            <span class="summary-value address-value small" id="reviewAddress">Enter address</span>
+                                            <span class="summary-label text-white-50">Recipient</span>
+                                            <span class="summary-value address-value small text-white" id="reviewAddress">Enter address</span>
                                         </div>
                                         
                                         @if($wallet->coin_type !== 'USDT')
                                         <div class="summary-item">
-                                            <span class="summary-label">Memo</span>
-                                            <span class="summary-value address-value small" id="reviewMemo">None</span>
+                                            <span class="summary-label text-white-50">Memo</span>
+                                            <span class="summary-value address-value small text-white" id="reviewMemo">None</span>
                                         </div>
                                         @endif
                                         
                                         <div class="summary-item">
-                                            <span class="summary-label">Processing</span>
-                                            <span class="summary-value">3-5 minutes</span>
+                                            <span class="summary-label text-white-50">Processing</span>
+                                            <span class="summary-value text-white">3-5 minutes</span>
                                         </div>
                                     </div>
                                 </div>
@@ -290,12 +290,12 @@
                                 <div class="security-check">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" id="confirmDetails" required>
-                                        <label class="form-check-label small" for="confirmDetails">
+                                        <label class="form-check-label small text-white" for="confirmDetails">
                                             I confirm the 
                                             @if($wallet->coin_type !== 'USDT')
-                                            <strong>address and memo</strong>
+                                            <strong class="text-white">address and memo</strong>
                                             @else
-                                            <strong>address</strong>
+                                            <strong class="text-white">address</strong>
                                             @endif
                                             are correct
                                         </label>
@@ -303,14 +303,14 @@
                                     
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" id="confirmIrreversible" required>
-                                        <label class="form-check-label small" for="confirmIrreversible">
+                                        <label class="form-check-label small text-white" for="confirmIrreversible">
                                             I understand this transaction cannot be reversed
                                         </label>
                                     </div>
                                     
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" id="confirmNetwork" required>
-                                        <label class="form-check-label small" for="confirmNetwork">
+                                        <label class="form-check-label small text-white" for="confirmNetwork">
                                             Network fees are non-refundable
                                         </label>
                                     </div>
@@ -318,7 +318,7 @@
                             </div>
                             
                             <div class="step-footer d-flex flex-column flex-sm-row gap-2">
-                                <button type="button" class="btn-prev" onclick="prevStep()">
+                                <button type="button" class="btn-prev text-white" onclick="prevStep()">
                                     <i class="bi bi-arrow-left me-2"></i>Back
                                 </button>
                                 <button type="submit" class="btn-confirm" id="submitBtn">
@@ -336,7 +336,7 @@
                     <div class="activity-icon">
                         <i class="bi bi-clock-history"></i>
                     </div>
-                    <h6 class="mb-0">Recent Withdrawals</h6>
+                    <h6 class="mb-0 text-white">Recent Withdrawals</h6>
                 </div>
                 <div class="card-body p-3 p-md-4">
                     @php
@@ -356,21 +356,21 @@
                             @endphp
                             <div class="activity-item">
                                 <div class="activity-item-icon">
-                                    <i class="bi bi-arrow-up-circle"></i>
+                                    <i class="bi bi-arrow-up-circle text-white-50"></i>
                                 </div>
                                 <div class="activity-item-content">
                                     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
                                         <div>
-                                            <strong>{{ number_format($tx->amount, 4) }} {{ $tx->coin_type }}</strong>
+                                            <strong class="text-white">{{ number_format($tx->amount, 4) }} {{ $tx->coin_type }}</strong>
                                             @if($usdRate > 0)
                                             <small class="text-white-50 d-block">≈ ${{ number_format($txUsdValue, 2) }}</small>
                                             @endif
                                         </div>
                                         <span class="badge status-{{ $tx->status }}">{{ $tx->status }}</span>
                                     </div>
-                                    <small class="text-muted d-block mt-1">{{ $tx->created_at->diffForHumans() }}</small>
+                                    <small class="text-white-50 d-block mt-1">{{ $tx->created_at->diffForHumans() }}</small>
                                     @if($tx->to_address)
-                                    <small class="text-muted d-block text-truncate">
+                                    <small class="text-white-50 d-block text-truncate">
                                         To: {{ $tx->to_address }}
                                     </small>
                                     @endif
@@ -381,10 +381,10 @@
                     @else
                         <div class="empty-activity">
                             <div class="empty-icon">
-                                <i class="bi bi-arrow-up-circle"></i>
+                                <i class="bi bi-arrow-up-circle text-white-50"></i>
                             </div>
-                            <p class="mb-2">No withdrawal history</p>
-                            <small class="text-muted">Your withdrawals will appear here</small>
+                            <p class="mb-2 text-white">No withdrawal history</p>
+                            <small class="text-white-50">Your withdrawals will appear here</small>
                         </div>
                     @endif
                 </div>
@@ -399,7 +399,7 @@
                     <div class="notice-icon">
                         <i class="bi bi-exclamation-triangle"></i>
                     </div>
-                    <h6 class="mb-0">Important Notice</h6>
+                    <h6 class="mb-0 text-white">Important Notice</h6>
                 </div>
                 <div class="card-body p-3 p-md-4">
                     <div class="notice-item">
@@ -407,18 +407,30 @@
                             <i class="bi bi-shield-exclamation"></i>
                         </div>
                         <div class="notice-item-content">
-                            <h6>Irreversible</h6>
-                            <p class="small mb-0">Cannot be reversed once confirmed</p>
+                            <h6 class="text-white">Irreversible</h6>
+                            <p class="text-white-50 small mb-0">Cannot be reversed once confirmed</p>
                         </div>
                     </div>
+
+                    @if($wallet->coin_type !== 'USDT')
+                    <div class="notice-item">
+                        <div class="notice-item-icon success">
+                            <i class="bi bi-key"></i>
+                        </div>
+                        <div class="notice-item-content">
+                            <h6 class="text-white">Memo/Tag Required</h6>
+                            <p class="text-white-50 small mb-0">Some exchanges require a memo</p>
+                        </div>
+                    </div>
+                    @endif
                     
                     <div class="notice-item">
                         <div class="notice-item-icon info">
                             <i class="bi bi-clock"></i>
                         </div>
                         <div class="notice-item-content">
-                            <h6>Processing Time</h6>
-                            <p class="small mb-0">10-30 minutes typically</p>
+                            <h6 class="text-white">Processing Time</h6>
+                            <p class="text-white-50 small mb-0">10-30 minutes typically</p>
                         </div>
                     </div>
                     
@@ -427,30 +439,20 @@
                             <i class="bi bi-check-circle"></i>
                         </div>
                         <div class="notice-item-content">
-                            <h6>Address Verification</h6>
-                            <p class="small mb-0">Double-check the recipient address</p>
+                            <h6 class="text-white">Address Verification</h6>
+                            <p class="text-white-50 small mb-0">Double-check the recipient address</p>
                         </div>
                     </div>
                     
-                    @if($wallet->coin_type !== 'USDT')
-                    <div class="notice-item">
-                        <div class="notice-item-icon success">
-                            <i class="bi bi-key"></i>
-                        </div>
-                        <div class="notice-item-content">
-                            <h6>Memo/Tag Required</h6>
-                            <p class="small mb-0">Some exchanges require a memo</p>
-                        </div>
-                    </div>
-                    @endif
+                    
                     
                     <div class="notice-item">
                         <div class="notice-item-icon success">
                             <i class="bi bi-currency-exchange"></i>
                         </div>
                         <div class="notice-item-content">
-                            <h6>Network Fees</h6>
-                            <p class="small mb-0">Standard fees apply, non-refundable</p>
+                            <h6 class="text-white">Network Fees</h6>
+                            <p class="text-white-50 small mb-0">Standard fees apply, non-refundable</p>
                         </div>
                     </div>
                 </div>
@@ -462,51 +464,51 @@
                     <h6 class="small text-uppercase text-white-50 mb-3">Withdrawal Info</h6>
                     
                     <div class="info-item">
-                        <i class="bi bi-currency-exchange"></i>
-                        <span>Coin:</span>
-                        <strong>{{ $wallet->coin_type }}</strong>
+                        <i class="bi bi-currency-exchange text-white-50"></i>
+                        <span class="text-white-50">Coin:</span>
+                        <strong class="text-white">{{ $wallet->coin_type }}</strong>
                     </div>
                     
                     @if($usdRate > 0)
                     <div class="info-item">
-                        <i class="bi bi-currency-dollar"></i>
-                        <span>USD Rate:</span>
-                        <strong>${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }}</strong>
+                        <i class="bi bi-currency-dollar text-white-50"></i>
+                        <span class="text-white-50">USD Rate:</span>
+                        <strong class="text-white">${{ number_format($usdRate, $wallet->coin_type == 'USDT' ? 2 : 4) }}</strong>
                     </div>
                     @endif
                     
                     <div class="info-item">
-                        <i class="bi bi-cash-coin"></i>
-                        <span>Minimum:</span>
-                        <strong>0.001 {{ $wallet->coin_type }}</strong>
+                        <i class="bi bi-cash-coin text-white-50"></i>
+                        <span class="text-white-50">Minimum:</span>
+                        <strong class="text-white">0.001 {{ $wallet->coin_type }}</strong>
                     </div>
                     
                     @if($usdRate > 0)
                     <div class="info-item">
-                        <i class="bi bi-currency-dollar"></i>
-                        <span>Min (USD):</span>
-                        <strong>${{ number_format(0.001 * $usdRate, 2) }}</strong>
+                        <i class="bi bi-currency-dollar text-white-50"></i>
+                        <span class="text-white-50">Min (USD):</span>
+                        <strong class="text-white">${{ number_format(0.001 * $usdRate, 2) }}</strong>
                     </div>
                     @endif
                     
                     <div class="info-item">
-                        <i class="bi bi-lightning-charge"></i>
-                        <span>Network Fee:</span>
-                        <strong>0.001 {{ $wallet->coin_type }}</strong>
+                        <i class="bi bi-lightning-charge text-white-50"></i>
+                        <span class="text-white-50">Network Fee:</span>
+                        <strong class="text-white">0.001 {{ $wallet->coin_type }}</strong>
                     </div>
                     
                     @if($usdRate > 0)
                     <div class="info-item">
-                        <i class="bi bi-currency-dollar"></i>
-                        <span>Fee (USD):</span>
-                        <strong>${{ number_format(0.001 * $usdRate, 2) }}</strong>
+                        <i class="bi bi-currency-dollar text-white-50"></i>
+                        <span class="text-white-50">Fee (USD):</span>
+                        <strong class="text-white">${{ number_format(0.001 * $usdRate, 2) }}</strong>
                     </div>
                     @endif
                     
                     <div class="info-item">
-                        <i class="bi bi-clock"></i>
-                        <span>Processing:</span>
-                        <strong>10-30 min</strong>
+                        <i class="bi bi-clock text-white-50"></i>
+                        <span class="text-white-50">Processing:</span>
+                        <strong class="text-white">10-30 min</strong>
                     </div>
                 </div>
             </div>
@@ -515,7 +517,7 @@
 </div>
 
 <style>
-/* Modern Glass Design */
+/* Modern Glass Design with Enhanced Text Contrast */
 :root {
     --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --danger-gradient: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
@@ -523,12 +525,31 @@
     --success-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
     --info-gradient: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
     --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.15);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    --card-bg: rgba(15, 23, 42, 0.7);
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
+    --card-bg: rgba(15, 23, 42, 0.8);
+    
+    /* Enhanced Text Colors - Pure White Variations */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.85);
+    --text-tertiary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.6);
+    --text-dim: rgba(255, 255, 255, 0.45);
 }
+
+/* Base Text Colors */
+body {
+    color: var(--text-primary);
+}
+
+.text-white { color: #ffffff !important; }
+.text-white-90 { color: rgba(255, 255, 255, 0.9) !important; }
+.text-white-85 { color: rgba(255, 255, 255, 0.85) !important; }
+.text-white-80 { color: rgba(255, 255, 255, 0.8) !important; }
+.text-white-75 { color: rgba(255, 255, 255, 0.75) !important; }
+.text-white-70 { color: rgba(255, 255, 255, 0.7) !important; }
+.text-white-50 { color: rgba(255, 255, 255, 0.6) !important; }
+.text-white-25 { color: rgba(255, 255, 255, 0.4) !important; }
 
 /* Header Styles */
 .welcome-header {
@@ -544,13 +565,6 @@
     .welcome-header {
         padding: 2rem;
     }
-}
-
-.gradient-text {
-    background: linear-gradient(135deg, #fff 0%, #c7d2fe 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
 .btn-back {
@@ -577,6 +591,7 @@
     background: var(--primary-gradient);
     border-color: transparent;
     transform: translateY(-2px);
+    color: white;
 }
 
 .wallet-info-badge {
@@ -593,6 +608,7 @@
     opacity: 0.9;
     margin-bottom: 0.25rem;
     font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 /* Withdrawal Card */
@@ -606,7 +622,7 @@
 }
 
 .withdraw-card-glass .card-header {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     border-bottom: 1px solid var(--glass-border);
     padding: 1.25rem;
     display: flex;
@@ -645,8 +661,8 @@
 }
 
 .exchange-rate-info {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: 14px;
     padding: 1rem;
 }
@@ -679,14 +695,14 @@
     width: 48px;
     height: 48px;
     border-radius: 16px;
-    background: var(--glass-bg);
-    border: 2px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: white;
     flex-shrink: 0;
 }
 
@@ -700,7 +716,7 @@
 
 /* Amount Section */
 .amount-input-container {
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     padding: 1.25rem;
@@ -713,19 +729,23 @@
 }
 
 .form-control-modern {
-    background: var(--card-bg);
+    background: rgba(0, 0, 0, 0.3);
     border: 2px solid var(--glass-border);
     border-radius: 12px;
     padding: 1rem;
-    color: var(--text-primary);
+    color: white;
     font-size: 1.125rem;
     font-weight: 500;
     transition: all 0.3s ease;
     width: 100%;
 }
 
+.form-control-modern::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
 .form-control-modern:focus {
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 0.4);
     border-color: #667eea;
     outline: none;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
@@ -736,7 +756,7 @@
     right: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.6);
     font-weight: 600;
 }
 
@@ -768,11 +788,11 @@
 }
 
 .btn-quick-amount {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
     padding: 0.5rem 0.75rem;
-    color: var(--text-primary);
+    color: white;
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -783,6 +803,7 @@
     background: var(--primary-gradient);
     border-color: transparent;
     transform: translateY(-2px);
+    color: white;
 }
 
 .balance-info {
@@ -795,7 +816,7 @@
 
 /* Address Section */
 .address-input-container {
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     padding: 1.25rem;
@@ -811,7 +832,7 @@
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .input-with-icon .form-control-modern {
@@ -830,6 +851,7 @@
     gap: 0.5rem;
     margin-top: 0.5rem;
     font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 /* Step Navigation Buttons */
@@ -858,14 +880,15 @@
 }
 
 .btn-prev {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
 }
 
 .btn-prev:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
+    color: white;
 }
 
 .btn-next {
@@ -877,6 +900,7 @@
 .btn-next:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    color: white;
 }
 
 .btn-confirm {
@@ -888,11 +912,12 @@
 .btn-confirm:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+    color: white;
 }
 
 /* Review Section */
 .summary-card {
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     overflow: hidden;
@@ -900,7 +925,7 @@
 }
 
 .summary-header {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     padding: 1rem 1.25rem;
     display: flex;
     align-items: center;
@@ -909,7 +934,7 @@
 }
 
 .summary-header i {
-    color: var(--text-primary);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .summary-content {
@@ -921,7 +946,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .summary-item:last-child {
@@ -931,18 +956,18 @@
 .summary-item.total {
     padding-top: 1rem;
     margin-top: 0.5rem;
-    border-top: 2px solid var(--glass-border);
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .summary-label {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .summary-value {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: white;
     text-align: right;
 }
 
@@ -954,13 +979,13 @@
 
 .summary-divider {
     height: 1px;
-    background: var(--glass-border);
+    background: rgba(255, 255, 255, 0.15);
     margin: 0.75rem 0;
 }
 
 /* Security Check */
 .security-check {
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     padding: 1.25rem;
@@ -982,8 +1007,8 @@
     top: 0.125rem;
     width: 1.25rem;
     height: 1.25rem;
-    background-color: var(--card-bg);
-    border: 2px solid var(--glass-border);
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 6px;
     cursor: pointer;
 }
@@ -991,6 +1016,11 @@
 .form-check-input:checked {
     background-color: #667eea;
     border-color: #667eea;
+}
+
+.form-check-label {
+    color: white;
+    line-height: 1.4;
 }
 
 /* Sidebar Cards */
@@ -1003,7 +1033,7 @@
 }
 
 .notice-card .card-header, .activity-card .card-header {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     border-bottom: 1px solid var(--glass-border);
     padding: 1rem 1.25rem;
     display: flex;
@@ -1034,7 +1064,7 @@
     display: flex;
     gap: 0.75rem;
     padding: 1rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .notice-item:last-child {
@@ -1072,8 +1102,12 @@
 .notice-item-content h6 {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: white;
     margin-bottom: 0.25rem;
+}
+
+.notice-item-content p {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 /* Activity List */
@@ -1081,7 +1115,7 @@
     display: flex;
     gap: 0.75rem;
     padding: 1rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .activity-item:last-child {
@@ -1092,13 +1126,13 @@
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.875rem;
-    color: var(--text-primary);
+    color: white;
     flex-shrink: 0;
 }
 
@@ -1116,21 +1150,19 @@
     font-size: 0.75rem;
     font-weight: 600;
     white-space: nowrap;
+    color: white;
 }
 
 .status-completed {
     background: var(--success-gradient);
-    color: white;
 }
 
 .status-pending {
     background: var(--warning-gradient);
-    color: white;
 }
 
 .status-failed {
     background: var(--danger-gradient);
-    color: white;
 }
 
 /* Info Card */
@@ -1139,7 +1171,7 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .info-item:last-child {
@@ -1150,25 +1182,25 @@
     width: 28px;
     height: 28px;
     border-radius: 8px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
+    color: white;
     font-size: 0.75rem;
     flex-shrink: 0;
 }
 
 .info-item span {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.7);
     flex: 1;
 }
 
 .info-item strong {
     font-size: 0.875rem;
-    color: var(--text-primary);
+    color: white;
     font-weight: 600;
 }
 
@@ -1182,12 +1214,12 @@
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.6);
     font-size: 1.25rem;
     margin-bottom: 1rem;
 }
@@ -1238,28 +1270,62 @@
     justify-content: center;
     font-size: 1rem;
     flex-shrink: 0;
+    color: white;
 }
 
 .toast-notification.success .toast-icon {
     background: var(--success-gradient);
-    color: white;
 }
 
 .toast-notification.error .toast-icon {
     background: var(--danger-gradient);
+}
+
+.toast-message {
     color: white;
+    line-height: 1.4;
 }
 
 /* Utility Classes */
 .text-white-50 {
-    color: var(--text-secondary) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
 }
 
-.text-primary-gradient {
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.text-white-75 {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Form Labels */
+.form-label {
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Badge Text */
+.badge {
+    color: white;
+}
+
+/* Gradient Text for Special Cases */
+.text-success {
+    color: #10b981 !important;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-primary {
+    color: #667eea !important;
 }
 </style>
 
