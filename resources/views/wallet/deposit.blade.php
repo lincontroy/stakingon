@@ -98,7 +98,7 @@
                                     </div>
                                     <div>
                                         <span class="d-block small text-white-50 fw-medium mb-1">Deposit Account</span>
-                                        <h6 class="fs-6 fw-semibold text-white mb-0">Official Account</h6>
+                                        <h6 class="fs-6 fw-semibold text-white mb-0">Official Address</h6>
                                     </div>
                                 </div>
                                 
